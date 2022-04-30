@@ -1,0 +1,28 @@
+project: universe
+lastuploaded: ""
+functions:
+  create-data:
+    id: 9affad4e-1e93-40cd-b9c6-b28a708e05bd
+    name: create-data
+    checksum: 49fbfa7af289a29fa2983b9d43d2da47b9d5de64f1a5c30e0e01dc06d2924cdd
+  delete-data:
+    id: e97b0e62-3659-401f-ade2-92b7130991cc
+    name: delete-data
+    checksum: 49fbfa7af289a29fa2983b9d43d2da47b9d5de64f1a5c30e0e01dc06d2924cdd
+  list-data:
+    id: 891916b3-cf68-46ab-b16d-60c3757ce5dc
+    name: list-data
+    checksum: 49fbfa7af289a29fa2983b9d43d2da47b9d5de64f1a5c30e0e01dc06d2924cdd
+  read-data:
+    id: 7f187481-f407-4bad-aa66-dfa10387397b
+    name: read-data
+    checksum: 49fbfa7af289a29fa2983b9d43d2da47b9d5de64f1a5c30e0e01dc06d2924cdd
+  update-data:
+    id: 9c22bd49-47b6-47f1-a134-d4bfb7531b31
+    name: update-data
+    checksum: 49fbfa7af289a29fa2983b9d43d2da47b9d5de64f1a5c30e0e01dc06d2924cdd
+gateways:
+  data-gateway:
+    id: 02591702-78b7-47aa-8435-c38011fe09ba
+    name: data-gateway
+    short: gUSyUfrQUh

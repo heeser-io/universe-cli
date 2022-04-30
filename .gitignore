@@ -1,0 +1,5 @@
+.DS_Store
+bin
+*.zip
+node_modules
+.env

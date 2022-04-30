@@ -1,0 +1,31 @@
+project: universe
+version: v1
+functions:
+  - name: create-data
+    handler: bin/test
+  - name: read-data
+    handler: bin/test
+  - name: update-data
+    handler: bin/test
+  - name: delete-data
+    handler: bin/test
+  - name: list-data
+    handler: bin/test
+gateways:
+  - name: data-gateway
+    routes:
+      - function: create-data
+        method: POST
+        path: data
+      - function: read-data
+        method: GET
+        path: data/#{id}
+      - function: update-data
+        method: PUT
+        path: data/#{id}
+      - function: delete-data
+        method: DELETE
+        path: data/#{id}
+      - function: list-data
+        method: GET
+        path: data
