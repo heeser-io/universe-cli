@@ -1,7 +1,7 @@
 package builder
 
 import (
-	"log"
+	"fmt"
 	"os"
 	"time"
 
@@ -76,15 +76,32 @@ func BuildStack(filepath string) {
 		if cf != nil {
 
 			if checksum != cf.Checksum {
-				log.Println("other")
+				// update file and function
+				functionObj, err := UpdateFunction(&UpdateAndUploadFunction{
+					FunctionID: cf.ID,
+					Filepath:   function.Handler,
+				})
+
+				color.Green("successfully updated function %s (%s) to version %d", functionObj.Name, functionObj.ID, functionObj.Version)
+				if err != nil {
+					panic(err)
+				}
+
+				// release function
+				if err := ReleaseFunction(functionObj.ID); err != nil {
+					panic(err)
+				}
+
+				color.Green("successfully released function %s (%s) with version %d", functionObj.Name, functionObj.ID, functionObj.Version)
 
 				cf.Checksum = checksum
+				cache.LastUploaded = time.Now().Format(time.RFC3339)
 			} else {
 				color.Yellow("function %s file not changed", function.Name)
 			}
 		} else {
 			// Create function
-			functionObj, err := CreateFunction(&CreateAndUploaFunction{
+			functionObj, err := CreateFunction(&CreateAndUploadFunction{
 				Filepath: function.Handler,
 				Name:     function.Name,
 				Language: "golang",
@@ -95,6 +112,7 @@ func BuildStack(filepath string) {
 			}
 
 			color.Green("successfully created function %s (%s)", functionObj.Name, functionObj.ID)
+
 			cf = &FunctionCache{
 				ID:       functionObj.ID,
 				Checksum: checksum,
@@ -102,6 +120,12 @@ func BuildStack(filepath string) {
 			}
 			cache.Functions[function.Name] = cf
 
+			// release function
+			if err := ReleaseFunction(functionObj.ID); err != nil {
+				panic(err)
+			}
+
+			color.Green("successfully released function %s (%s) with version", functionObj.Name, functionObj.ID, functionObj.Version)
 			cache.LastUploaded = time.Now().Format(time.RFC3339)
 		}
 	}
@@ -135,10 +159,16 @@ func BuildStack(filepath string) {
 			}
 			color.Green("successfully created gateway %s (%s)", gw.Name, gatewayObj.ID)
 
+			rc := []Route{}
+			for _, r := range gw.Routes {
+				r.Path = fmt.Sprintf("https://apigw-dev.heeser.io/v1/gateways/v1/%s/%s", gatewayObj.Short, r.Path)
+				rc = append(rc, r)
+			}
 			cg = &GatewayCache{
-				ID:    gatewayObj.ID,
-				Name:  gatewayObj.Name,
-				Short: gatewayObj.Short,
+				ID:     gatewayObj.ID,
+				Name:   gatewayObj.Name,
+				Short:  gatewayObj.Short,
+				Routes: rc,
 			}
 
 			cache.Gateways[gatewayObj.Name] = cg

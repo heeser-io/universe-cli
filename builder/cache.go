@@ -15,9 +15,10 @@ type Cache struct {
 }
 
 type GatewayCache struct {
-	ID    string `yml:"id"`
-	Name  string `yml:"name"`
-	Short string `yml:"short"`
+	ID     string  `yml:"id"`
+	Name   string  `yml:"name"`
+	Short  string  `yml:"short"`
+	Routes []Route `yml:"routes"`
 }
 type FunctionCache struct {
 	ID       string `yml:"id"`

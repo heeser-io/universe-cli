@@ -2,15 +2,15 @@ project: universe
 version: v1
 functions:
   - name: create-data
-    handler: bin/test
+    handler: bin/create
   - name: read-data
-    handler: bin/test
+    handler: bin/read
   - name: update-data
-    handler: bin/test
+    handler: bin/update
   - name: delete-data
-    handler: bin/test
+    handler: bin/delete
   - name: list-data
-    handler: bin/test
+    handler: bin/list
 gateways:
   - name: data-gateway
     routes:

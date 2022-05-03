@@ -8,18 +8,75 @@ import (
 
 	v1 "github.com/heeser-io/file-cdn/api-go/v1"
 	functions_v1 "github.com/heeser-io/functions/api-go/v1"
+	"github.com/joho/godotenv"
 )
 
-type CreateAndUploaFunction struct {
+type CreateAndUploadFunction struct {
 	Filepath string
 	Name     string
 	Language string
 }
 
-func CreateFunction(params *CreateAndUploaFunction) (*functions_v1.Function, error) {
-	apiKey := os.Getenv("API_KEY")
+type UpdateAndUploadFunction struct {
+	FunctionID string
+	Filepath   string
+}
 
-	c := v1.WithAPIKey(apiKey)
+var (
+	API_KEY string
+)
+
+func init() {
+	godotenv.Load()
+	API_KEY = os.Getenv("API_KEY")
+}
+func ReleaseFunction(functionID string) error {
+	c := functions_v1.WithAPIKey(API_KEY)
+
+	releaseParams := functions_v1.ReleaseFunctionParams{
+		FunctionID: functionID,
+	}
+
+	if err := c.Function.Release(&releaseParams); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func UpdateFunction(params *UpdateAndUploadFunction) (*functions_v1.Function, error) {
+	c := v1.WithAPIKey(API_KEY)
+
+	fileParams := v1.CreateFileParams{
+		Filename:       path.Base(params.Filepath),
+		Tags:           []string{"functions"},
+		IsFunctionFile: true,
+	}
+	fileObj, err := c.File.Create(&fileParams)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := fileObj.Upload(params.Filepath); err != nil {
+		log.Fatal(err)
+	}
+	fileObj.SignedUploadUrl = ""
+
+	updateFunctionFileParams := functions_v1.UpdateFunctionFileParams{
+		FunctionID: params.FunctionID,
+		FileID:     fileObj.ID,
+	}
+
+	functionClient := functions_v1.WithAPIKey(API_KEY)
+	functionObj, err := functionClient.Function.UpdateFile(&updateFunctionFileParams)
+	if err != nil {
+		return nil, err
+	}
+
+	return functionObj, nil
+}
+func CreateFunction(params *CreateAndUploadFunction) (*functions_v1.Function, error) {
+	c := v1.WithAPIKey(API_KEY)
 
 	fileParams := v1.CreateFileParams{
 		Filename:       path.Base(params.Filepath),
@@ -43,7 +100,7 @@ func CreateFunction(params *CreateAndUploaFunction) (*functions_v1.Function, err
 		Language: params.Language,
 	}
 
-	functionClient := functions_v1.WithAPIKey(apiKey)
+	functionClient := functions_v1.WithAPIKey(API_KEY)
 	functionObj, err := functionClient.Function.Create(&createFunctionParams)
 	if err != nil {
 		return nil, err
