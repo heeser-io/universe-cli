@@ -6,15 +6,16 @@ import (
 	"os"
 	"path"
 
-	v1 "github.com/heeser-io/file-cdn/api-go/v1"
-	functions_v1 "github.com/heeser-io/functions/api-go/v1"
+	v1 "github.com/heeser-io/universe/api/v1"
 	"github.com/joho/godotenv"
 )
 
 type CreateAndUploadFunction struct {
-	Filepath string
-	Name     string
-	Language string
+	ProjectID string
+	Filepath  string
+	Name      string
+	Language  string
+	Checksum  string
 }
 
 type UpdateAndUploadFunction struct {
@@ -30,10 +31,11 @@ func init() {
 	godotenv.Load()
 	API_KEY = os.Getenv("API_KEY")
 }
-func ReleaseFunction(functionID string) error {
-	c := functions_v1.WithAPIKey(API_KEY)
 
-	releaseParams := functions_v1.ReleaseFunctionParams{
+func ReleaseFunction(functionID string) error {
+	c := v1.WithAPIKey(API_KEY)
+
+	releaseParams := v1.ReleaseFunctionParams{
 		FunctionID: functionID,
 	}
 
@@ -44,11 +46,12 @@ func ReleaseFunction(functionID string) error {
 	return nil
 }
 
-func UpdateFunction(params *UpdateAndUploadFunction) (*functions_v1.Function, error) {
+func UpdateFunction(params *UpdateAndUploadFunction) (*v1.Function, error) {
 	c := v1.WithAPIKey(API_KEY)
 
 	fileParams := v1.CreateFileParams{
 		Filename:       path.Base(params.Filepath),
+		Name:           fmt.Sprintf("function %s", params.FunctionID),
 		Tags:           []string{"functions"},
 		IsFunctionFile: true,
 	}
@@ -62,24 +65,25 @@ func UpdateFunction(params *UpdateAndUploadFunction) (*functions_v1.Function, er
 	}
 	fileObj.SignedUploadUrl = ""
 
-	updateFunctionFileParams := functions_v1.UpdateFunctionFileParams{
+	updateFunctionFileParams := v1.UpdateFunctionFileParams{
 		FunctionID: params.FunctionID,
 		FileID:     fileObj.ID,
 	}
 
-	functionClient := functions_v1.WithAPIKey(API_KEY)
-	functionObj, err := functionClient.Function.UpdateFile(&updateFunctionFileParams)
+	functionObj, err := c.Function.UpdateFile(&updateFunctionFileParams)
 	if err != nil {
 		return nil, err
 	}
 
 	return functionObj, nil
 }
-func CreateFunction(params *CreateAndUploadFunction) (*functions_v1.Function, error) {
+func CreateFunction(params *CreateAndUploadFunction) (*v1.Function, error) {
 	c := v1.WithAPIKey(API_KEY)
 
 	fileParams := v1.CreateFileParams{
 		Filename:       path.Base(params.Filepath),
+		Name:           fmt.Sprintf("function %s", params.Name),
+		ProjectID:      params.ProjectID,
 		Description:    fmt.Sprintf("file for the function %s", params.Name),
 		Tags:           []string{"functions"},
 		IsFunctionFile: true,
@@ -94,13 +98,15 @@ func CreateFunction(params *CreateAndUploadFunction) (*functions_v1.Function, er
 	}
 	fileObj.SignedUploadUrl = ""
 
-	createFunctionParams := functions_v1.CreateFunctionParams{
-		Name:     params.Name,
-		FileID:   fileObj.ID,
-		Language: params.Language,
+	createFunctionParams := v1.CreateFunctionParams{
+		Name:      params.Name,
+		ProjectID: params.ProjectID,
+		Checksum:  params.Checksum,
+		FileID:    fileObj.ID,
+		Language:  params.Language,
 	}
 
-	functionClient := functions_v1.WithAPIKey(API_KEY)
+	functionClient := v1.WithAPIKey(API_KEY)
 	functionObj, err := functionClient.Function.Create(&createFunctionParams)
 	if err != nil {
 		return nil, err

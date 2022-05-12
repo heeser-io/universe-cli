@@ -1,24 +1,25 @@
 package builder
 
 import (
-	"fmt"
 	"os"
 
+	v1 "github.com/heeser-io/universe/api/v1"
 	"gopkg.in/yaml.v2"
 )
 
 type Cache struct {
-	Project      string                    `yml:"project"`
-	LastUploaded string                    `yml:"lastUploaded"`
-	Functions    map[string]*FunctionCache `yml:"functions"`
-	Gateways     map[string]*GatewayCache  `yml:"gateways"`
+	Project      v1.Project              `yml:"project"`
+	LastUploaded string                  `yml:"lastUploaded"`
+	Functions    map[string]*v1.Function `yml:"functions"`
+	Gateways     map[string]*v1.Gateway  `yml:"gateways"`
 }
 
 type GatewayCache struct {
-	ID     string  `yml:"id"`
-	Name   string  `yml:"name"`
-	Short  string  `yml:"short"`
-	Routes []Route `yml:"routes"`
+	ID        string  `yml:"id"`
+	ProjectID string  `yml:"projectId"`
+	Name      string  `yml:"name"`
+	Short     string  `yml:"short"`
+	Routes    []Route `yml:"routes"`
 }
 type FunctionCache struct {
 	ID       string `yml:"id"`
@@ -26,17 +27,15 @@ type FunctionCache struct {
 	Checksum string `yml:"checksum"`
 }
 
-func LoadOrCreate(project string) *Cache {
-	fb, err := os.ReadFile(fmt.Sprintf(".%s.yml", project))
+func LoadOrCreate() *Cache {
+	fb, err := os.ReadFile(".stack.yml")
 
 	create := false
 	if err != nil {
 		create = true
 	}
 
-	c := Cache{
-		Project: project,
-	}
+	c := Cache{}
 	if !create {
 		if err := yaml.Unmarshal(fb, &c); err != nil {
 			panic(err)
@@ -51,7 +50,7 @@ func (c *Cache) Save() {
 	if err != nil {
 		panic(err)
 	}
-	if err := os.WriteFile(fmt.Sprintf(".%s.yml", c.Project), b, os.ModePerm); err != nil {
+	if err := os.WriteFile(".stack.yml", b, os.ModePerm); err != nil {
 		panic(err)
 	}
 }

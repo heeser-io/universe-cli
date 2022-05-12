@@ -1,0 +1,110 @@
+project:
+  id: 627d7cfd95a336e1988c5efd
+  userid: 4830e158-a3c3-4e63-872f-a01d2febc23e
+  name: universe
+  tags: []
+  createdat: "2022-05-12T21:32:45Z"
+  updatedat: "2022-05-12T21:32:45Z"
+lastuploaded: "2022-05-12T23:33:02+02:00"
+functions:
+  create-data:
+    id: 627d7d02eefbc6048373fef8
+    projectid: 627d7cfd95a336e1988c5efd
+    userid: 4830e158-a3c3-4e63-872f-a01d2febc23e
+    name: create-data
+    checksum: eaad9838cbc738adb1c19a25e1549232bb5be22b4cf6094f8a0a3f33717fd14c
+    language: golang
+    fileid: 627d7cfda4158cc539727ad8
+    versionfiles: {}
+    version: 1
+    currentversion: 0
+    tags: []
+    createdat: "2022-05-12T21:32:50Z"
+    updatedat: "2022-05-12T21:32:50Z"
+    lastreleasedat: ""
+  delete-data:
+    id: 627d7d0beefbc6048373fefb
+    projectid: 627d7cfd95a336e1988c5efd
+    userid: 4830e158-a3c3-4e63-872f-a01d2febc23e
+    name: delete-data
+    checksum: 92568b5b726eb329abc8ddf76d3b0a46c78a5a68014458b41ffbab2cd8db5404
+    language: golang
+    fileid: 627d7d08a4158cc539727adb
+    versionfiles: {}
+    version: 1
+    currentversion: 0
+    tags: []
+    createdat: "2022-05-12T21:32:59Z"
+    updatedat: "2022-05-12T21:32:59Z"
+    lastreleasedat: ""
+  list-data:
+    id: 627d7d0eeefbc6048373fefc
+    projectid: 627d7cfd95a336e1988c5efd
+    userid: 4830e158-a3c3-4e63-872f-a01d2febc23e
+    name: list-data
+    checksum: 2859062017c6208729eba54a75d4e6f89e3a1efbbd104b64cd6c12dfe6bc7e63
+    language: golang
+    fileid: 627d7d0ba4158cc539727adc
+    versionfiles: {}
+    version: 1
+    currentversion: 0
+    tags: []
+    createdat: "2022-05-12T21:33:02Z"
+    updatedat: "2022-05-12T21:33:02Z"
+    lastreleasedat: ""
+  read-data:
+    id: 627d7d05eefbc6048373fef9
+    projectid: 627d7cfd95a336e1988c5efd
+    userid: 4830e158-a3c3-4e63-872f-a01d2febc23e
+    name: read-data
+    checksum: b9f8603911d186d77924db5e94f305bca36e311ac8b01e49c8c41aca6add407d
+    language: golang
+    fileid: 627d7d02a4158cc539727ad9
+    versionfiles: {}
+    version: 1
+    currentversion: 0
+    tags: []
+    createdat: "2022-05-12T21:32:53Z"
+    updatedat: "2022-05-12T21:32:53Z"
+    lastreleasedat: ""
+  update-data:
+    id: 627d7d08eefbc6048373fefa
+    projectid: 627d7cfd95a336e1988c5efd
+    userid: 4830e158-a3c3-4e63-872f-a01d2febc23e
+    name: update-data
+    checksum: c3976e3996eab330b4bdb24e17c3fa6107b07f9abe519e70cf81ffb8379632a9
+    language: golang
+    fileid: 627d7d05a4158cc539727ada
+    versionfiles: {}
+    version: 1
+    currentversion: 0
+    tags: []
+    createdat: "2022-05-12T21:32:56Z"
+    updatedat: "2022-05-12T21:32:56Z"
+    lastreleasedat: ""
+gateways:
+  data-gateway:
+    id: 627d7d0f76301ffd95ae99c0
+    userid: 4830e158-a3c3-4e63-872f-a01d2febc23e
+    projectid: 627d7cfd95a336e1988c5efd
+    name: data-gateway
+    routes:
+    - method: POST
+      functionid: 627d7d02eefbc6048373fef8
+      path: data
+    - method: GET
+      functionid: 627d7d05eefbc6048373fef9
+      path: data/#{id}
+    - method: PUT
+      functionid: 627d7d08eefbc6048373fefa
+      path: data/#{id}
+    - method: DELETE
+      functionid: 627d7d0beefbc6048373fefb
+      path: data/#{id}
+    - method: GET
+      functionid: 627d7d0eeefbc6048373fefc
+      path: data
+    short: HXAwMSoJFM
+    tags: []
+    createdat: "2022-05-12T21:33:03Z"
+    updatedat: "2022-05-12T21:33:03Z"

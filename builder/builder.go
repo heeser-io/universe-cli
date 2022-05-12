@@ -1,14 +1,13 @@
 package builder
 
 import (
-	"fmt"
 	"os"
 	"time"
 
 	"github.com/fatih/color"
+	v1 "github.com/heeser-io/universe/api/v1"
+	"github.com/heeser-io/universe/services/gateway"
 
-	apigw "github.com/heeser-io/api-gateway/api-go/v1"
-	gateway "github.com/heeser-io/api-gateway/backend/functions/gateway"
 	"gopkg.in/yaml.v2"
 )
 
@@ -58,17 +57,27 @@ func BuildStack(filepath string) {
 	// Check old filehash vs new filehash
 	// create if none, update if differs, do nothing if its the same
 
+	apiKey := os.Getenv("API_KEY")
+	gwClient := v1.WithAPIKey(apiKey)
 	// load cache
-
-	cache := LoadOrCreate(stack.Project)
+	cache := LoadOrCreate()
 	if cache.Functions == nil {
-		cache.Functions = make(map[string]*FunctionCache)
+		cache.Functions = make(map[string]*v1.Function)
 	}
 
 	if cache.Gateways == nil {
-		cache.Gateways = make(map[string]*GatewayCache)
+		cache.Gateways = make(map[string]*v1.Gateway)
 	}
 
+	if cache.Project.ID == "" {
+		projectObj, err := gwClient.Project.Create(&v1.CreateProjectParams{
+			Name: stack.Project,
+		})
+		if err != nil {
+			panic(err)
+		}
+		cache.Project = *projectObj
+	}
 	for _, function := range stack.Functions {
 		checksum := Checksum(function.Handler)
 		// functions
@@ -94,17 +103,21 @@ func BuildStack(filepath string) {
 
 				color.Green("successfully released function %s (%s) with version %d", functionObj.Name, functionObj.ID, functionObj.Version)
 
+				now := time.Now().Format(time.RFC3339)
+				cf.LastReleasedAt = now
 				cf.Checksum = checksum
-				cache.LastUploaded = time.Now().Format(time.RFC3339)
+				cache.LastUploaded = now
 			} else {
 				color.Yellow("function %s file not changed", function.Name)
 			}
 		} else {
 			// Create function
 			functionObj, err := CreateFunction(&CreateAndUploadFunction{
-				Filepath: function.Handler,
-				Name:     function.Name,
-				Language: "golang",
+				Filepath:  function.Handler,
+				Checksum:  checksum,
+				ProjectID: cache.Project.ID,
+				Name:      function.Name,
+				Language:  "golang",
 			})
 			if err != nil {
 				color.Red("cannot create function %s, reason: %s", function.Name, err.Error())
@@ -113,24 +126,20 @@ func BuildStack(filepath string) {
 
 			color.Green("successfully created function %s (%s)", functionObj.Name, functionObj.ID)
 
-			cf = &FunctionCache{
-				ID:       functionObj.ID,
-				Checksum: checksum,
-				Name:     function.Name,
-			}
-			cache.Functions[function.Name] = cf
+			cf = functionObj
 
 			// release function
 			if err := ReleaseFunction(functionObj.ID); err != nil {
 				panic(err)
 			}
+			cf.LastReleasedAt = time.Now().Format(time.RFC3339)
+			cache.Functions[function.Name] = cf
 
 			color.Green("successfully released function %s (%s) with version", functionObj.Name, functionObj.ID, functionObj.Version)
 			cache.LastUploaded = time.Now().Format(time.RFC3339)
 		}
 	}
 
-	apiKey := os.Getenv("API_KEY")
 	for _, gw := range stack.Gateways {
 		cg := cache.Gateways[gw.Name]
 
@@ -147,10 +156,11 @@ func BuildStack(filepath string) {
 					Method:     r.Method,
 				})
 			}
-			gwClient := apigw.WithAPIKey(apiKey)
-			createGatewayParams := apigw.CreateGatewayParams{
-				Name:   gw.Name,
-				Routes: routes,
+
+			createGatewayParams := v1.CreateGatewayParams{
+				ProjectID: cache.Project.ID,
+				Name:      gw.Name,
+				Routes:    routes,
 			}
 
 			gatewayObj, err := gwClient.Gateway.Create(&createGatewayParams)
@@ -159,17 +169,7 @@ func BuildStack(filepath string) {
 			}
 			color.Green("successfully created gateway %s (%s)", gw.Name, gatewayObj.ID)
 
-			rc := []Route{}
-			for _, r := range gw.Routes {
-				r.Path = fmt.Sprintf("https://apigw-dev.heeser.io/v1/gateways/v1/%s/%s", gatewayObj.Short, r.Path)
-				rc = append(rc, r)
-			}
-			cg = &GatewayCache{
-				ID:     gatewayObj.ID,
-				Name:   gatewayObj.Name,
-				Short:  gatewayObj.Short,
-				Routes: rc,
-			}
+			cg = gatewayObj
 
 			cache.Gateways[gatewayObj.Name] = cg
 		}
