@@ -16,11 +16,13 @@ type CreateAndUploadFunction struct {
 	Name      string
 	Language  string
 	Checksum  string
+	Handler   string
 }
 
 type UpdateAndUploadFunction struct {
 	FunctionID string
 	Filepath   string
+	Checksum   string
 }
 
 var (
@@ -68,6 +70,7 @@ func UpdateFunction(params *UpdateAndUploadFunction) (*v1.Function, error) {
 	updateFunctionFileParams := v1.UpdateFunctionFileParams{
 		FunctionID: params.FunctionID,
 		FileID:     fileObj.ID,
+		Checksum:   params.Checksum,
 	}
 
 	functionObj, err := c.Function.UpdateFile(&updateFunctionFileParams)
@@ -102,6 +105,7 @@ func CreateFunction(params *CreateAndUploadFunction) (*v1.Function, error) {
 		Name:      params.Name,
 		ProjectID: params.ProjectID,
 		Checksum:  params.Checksum,
+		Handler:   params.Handler,
 		FileID:    fileObj.ID,
 		Language:  params.Language,
 	}

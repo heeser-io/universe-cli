@@ -18,10 +18,10 @@ type Stack struct {
 	Functions   []Function `yml:"functions"`
 	Gateways    []Gateway  `yml:"gateways"`
 }
-
 type Function struct {
 	Name    string `yml:"name"`
 	Handler string `yml:"handler"`
+	Path    string `yml:"path"`
 }
 
 type Gateway struct {
@@ -79,7 +79,7 @@ func BuildStack(filepath string) {
 		cache.Project = *projectObj
 	}
 	for _, function := range stack.Functions {
-		checksum := Checksum(function.Handler)
+		checksum := Checksum(function.Path)
 		// functions
 		cf := cache.Functions[function.Name]
 		if cf != nil {
@@ -88,7 +88,8 @@ func BuildStack(filepath string) {
 				// update file and function
 				functionObj, err := UpdateFunction(&UpdateAndUploadFunction{
 					FunctionID: cf.ID,
-					Filepath:   function.Handler,
+					Filepath:   function.Path,
+					Checksum:   checksum,
 				})
 
 				color.Green("successfully updated function %s (%s) to version %d", functionObj.Name, functionObj.ID, functionObj.Version)
@@ -113,7 +114,8 @@ func BuildStack(filepath string) {
 		} else {
 			// Create function
 			functionObj, err := CreateFunction(&CreateAndUploadFunction{
-				Filepath:  function.Handler,
+				Filepath:  function.Path,
+				Handler:   function.Handler,
 				Checksum:  checksum,
 				ProjectID: cache.Project.ID,
 				Name:      function.Name,
