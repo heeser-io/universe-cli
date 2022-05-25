@@ -3,11 +3,9 @@ package builder
 import (
 	"fmt"
 	"log"
-	"os"
 	"path"
 
 	v1 "github.com/heeser-io/universe/api/v1"
-	"github.com/joho/godotenv"
 )
 
 type CreateAndUploadFunction struct {
@@ -25,23 +23,12 @@ type UpdateAndUploadFunction struct {
 	Checksum   string
 }
 
-var (
-	API_KEY string
-)
-
-func init() {
-	godotenv.Load()
-	API_KEY = os.Getenv("API_KEY")
-}
-
 func ReleaseFunction(functionID string) error {
-	c := v1.WithAPIKey(API_KEY)
-
 	releaseParams := v1.ReleaseFunctionParams{
 		FunctionID: functionID,
 	}
 
-	if err := c.Function.Release(&releaseParams); err != nil {
+	if err := client.Function.Release(&releaseParams); err != nil {
 		return err
 	}
 
@@ -49,15 +36,13 @@ func ReleaseFunction(functionID string) error {
 }
 
 func UpdateFunction(params *UpdateAndUploadFunction) (*v1.Function, error) {
-	c := v1.WithAPIKey(API_KEY)
-
 	fileParams := v1.CreateFileParams{
 		Filename:       path.Base(params.Filepath),
 		Name:           fmt.Sprintf("function %s", params.FunctionID),
 		Tags:           []string{"functions"},
 		IsFunctionFile: true,
 	}
-	fileObj, err := c.File.Create(&fileParams)
+	fileObj, err := client.File.Create(&fileParams)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -73,7 +58,7 @@ func UpdateFunction(params *UpdateAndUploadFunction) (*v1.Function, error) {
 		Checksum:   params.Checksum,
 	}
 
-	functionObj, err := c.Function.UpdateFile(&updateFunctionFileParams)
+	functionObj, err := client.Function.UpdateFile(&updateFunctionFileParams)
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +66,6 @@ func UpdateFunction(params *UpdateAndUploadFunction) (*v1.Function, error) {
 	return functionObj, nil
 }
 func CreateFunction(params *CreateAndUploadFunction) (*v1.Function, error) {
-	c := v1.WithAPIKey(API_KEY)
-
 	fileParams := v1.CreateFileParams{
 		Filename:       path.Base(params.Filepath),
 		Name:           fmt.Sprintf("function %s", params.Name),
@@ -91,7 +74,7 @@ func CreateFunction(params *CreateAndUploadFunction) (*v1.Function, error) {
 		Tags:           []string{"functions"},
 		IsFunctionFile: true,
 	}
-	fileObj, err := c.File.Create(&fileParams)
+	fileObj, err := client.File.Create(&fileParams)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -110,8 +93,7 @@ func CreateFunction(params *CreateAndUploadFunction) (*v1.Function, error) {
 		Language:  params.Language,
 	}
 
-	functionClient := v1.WithAPIKey(API_KEY)
-	functionObj, err := functionClient.Function.Create(&createFunctionParams)
+	functionObj, err := client.Function.Create(&createFunctionParams)
 	if err != nil {
 		return nil, err
 	}

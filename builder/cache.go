@@ -3,32 +3,22 @@ package builder
 import (
 	"os"
 
+	"github.com/heeser-io/universe-cli/config"
 	v1 "github.com/heeser-io/universe/api/v1"
 	"gopkg.in/yaml.v2"
 )
 
 type Cache struct {
-	Project      v1.Project              `yml:"project"`
-	LastUploaded string                  `yml:"lastUploaded"`
-	Functions    map[string]*v1.Function `yml:"functions"`
-	Gateways     map[string]*v1.Gateway  `yml:"gateways"`
-}
-
-type GatewayCache struct {
-	ID        string  `yml:"id"`
-	ProjectID string  `yml:"projectId"`
-	Name      string  `yml:"name"`
-	Short     string  `yml:"short"`
-	Routes    []Route `yml:"routes"`
-}
-type FunctionCache struct {
-	ID       string `yml:"id"`
-	Name     string `yml:"name"`
-	Checksum string `yml:"checksum"`
+	Project      *v1.Project               `yaml:"project"`
+	Checksum     string                    `yaml:"checksum"`
+	LastUploaded string                    `yaml:"lastUploaded"`
+	Collections  map[string]*v1.Collection `yaml:"collections"`
+	Functions    map[string]*v1.Function   `yaml:"functions"`
+	Gateways     map[string]*v1.Gateway    `yaml:"gateways"`
 }
 
 func LoadOrCreate() *Cache {
-	fb, err := os.ReadFile(".stack.yml")
+	fb, err := os.ReadFile(config.Main.GetString("cacheFile"))
 
 	create := false
 	if err != nil {
@@ -50,7 +40,7 @@ func (c *Cache) Save() {
 	if err != nil {
 		panic(err)
 	}
-	if err := os.WriteFile(".stack.yml", b, os.ModePerm); err != nil {
+	if err := os.WriteFile(config.Main.GetString("cacheFile"), b, os.ModePerm); err != nil {
 		panic(err)
 	}
 }
