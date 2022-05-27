@@ -9,10 +9,7 @@ func HasChange() bool {
 	cache := LoadOrCreate()
 
 	cs := Checksum(config.Main.GetString("stackFile"))
-	if cs != cache.Checksum {
-		return true
-	}
-	return false
+	return cs != cache.Checksum
 }
 func Verify() {
 	cache := LoadOrCreate()
@@ -24,6 +21,18 @@ func Verify() {
 		panic(err)
 	}
 	cache.Project = p
+
+	for _, secretObj := range cache.Secrets {
+		readSecretParams := &v1.ReadSecretParams{
+			SecretID: secretObj.ID,
+		}
+
+		s, err := client.Secret.Read(readSecretParams)
+		if err != nil {
+			panic(err)
+		}
+		cache.Secrets[s.Name] = s
+	}
 
 	for _, collectionObj := range cache.Collections {
 		readCollectionParams := &v1.ReadCollectionParams{

@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -43,6 +44,10 @@ func BuildStack() {
 		cache.Collections = make(map[string]*v1.Collection)
 	}
 
+	if cache.Secrets == nil {
+		cache.Secrets = make(map[string]*v1.Secret)
+	}
+
 	if cache.Project == nil {
 		projectObj, err := client.Project.Create(&v1.CreateProjectParams{
 			Name: stack.Project,
@@ -55,7 +60,29 @@ func BuildStack() {
 
 	projectID := cache.Project.ID
 
-	wg := sync.WaitGroup{}
+	for _, s := range stack.Secrets {
+		cg := cache.Secrets[s.ID]
+
+		if cg != nil {
+			color.Yellow("secret %s exists", s.ID)
+		} else {
+			createSecretParams := v1.CreateSecretParams{
+				Value: s.Value,
+				Tags:  s.Tags,
+				Name:  s.Name,
+			}
+
+			secretObj, err := client.Secret.Create(&createSecretParams)
+			if err != nil {
+				panic(err)
+			}
+
+			color.Green("successfully created secret %s", secretObj.ID)
+
+			cg = secretObj
+			cache.Secrets[cg.Name] = cg
+		}
+	}
 
 	for _, collection := range stack.Collections {
 		cc := cache.Collections[collection.Name]
@@ -75,6 +102,9 @@ func BuildStack() {
 			cache.Collections[collection.Name] = cc
 		}
 	}
+
+	// push functions in parallel
+	wg := sync.WaitGroup{}
 
 	for _, function := range stack.Functions {
 		wg.Add(1)
@@ -115,13 +145,24 @@ func BuildStack() {
 				}
 			} else {
 				// Create function
-				functionObj, err := CreateFunction(&CreateAndUploadFunction{
-					Filepath:  function.Path,
-					Handler:   function.Handler,
-					Checksum:  checksum,
-					ProjectID: projectID,
-					Name:      function.Name,
-					Language:  "golang",
+				environment := []string{}
+
+				for _, e := range function.Environment {
+					s := cache.Secrets[e]
+					if s == nil {
+						panic(fmt.Sprintf("secret %s not found", e))
+					}
+					environment = append(environment, s.ID)
+				}
+				functionObj, err := CreateFunction(&v1.Function{
+					Path:        function.Path,
+					Handler:     function.Handler,
+					Checksum:    checksum,
+					ProjectID:   projectID,
+					Name:        function.Name,
+					Tags:        function.Tags,
+					Language:    function.Language,
+					Environment: environment,
 				})
 				if err != nil {
 					color.Red("cannot create function %s, reason: %s", function.Name, err.Error())

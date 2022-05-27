@@ -14,6 +14,7 @@ type Stack struct {
 	Collections []v1.Collection `yaml:"collections"`
 	Functions   []v1.Function   `yaml:"functions"`
 	Gateways    []v1.Gateway    `yaml:"gateways"`
+	Secrets     []v1.Secret     `yaml:"secrets"`
 }
 
 func ReadStack(filepath string) *Stack {
