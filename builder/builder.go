@@ -61,7 +61,7 @@ func BuildStack() {
 	projectID := cache.Project.ID
 
 	for _, s := range stack.Secrets {
-		cg := cache.Secrets[s.ID]
+		cg := cache.Secrets[s.Name]
 
 		if cg != nil {
 			color.Yellow("secret %s exists", s.ID)
