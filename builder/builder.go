@@ -17,12 +17,6 @@ var (
 	client  *v1.Client
 )
 
-func init() {
-	config.Init()
-	API_KEY = config.Main.Get("apiKey").(string)
-	client = v1.WithAPIKey(API_KEY)
-}
-
 func BuildStack() {
 	stack := ReadStack(config.Main.GetString("stackFile"))
 

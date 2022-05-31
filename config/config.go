@@ -25,7 +25,7 @@ func Init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	configPath := (path.Join(home, "/.meta-next"))
+	configPath := (path.Join(home, "/.universe"))
 
 	Main.SetConfigName("config")
 	Main.AddConfigPath(configPath)
