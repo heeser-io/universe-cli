@@ -7,7 +7,8 @@ import (
 
 var (
 	StackCmd = &cobra.Command{
-		Use: "stack",
+		Use:   "stack",
+		Short: "stack management for universecloud",
 	}
 )
 
