@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/heeser-io/universe-cli/client"
 	"github.com/heeser-io/universe-cli/config"
 	v1 "github.com/heeser-io/universe/api/v1"
 	"github.com/heeser-io/universe/services/gateway"
@@ -14,7 +15,6 @@ import (
 
 var (
 	API_KEY string
-	client  *v1.Client
 )
 
 func BuildStack() {
@@ -43,7 +43,7 @@ func BuildStack() {
 	}
 
 	if cache.Project == nil {
-		projectObj, err := client.Project.Create(&v1.CreateProjectParams{
+		projectObj, err := client.Client.Project.Create(&v1.CreateProjectParams{
 			Name: stack.Project,
 		})
 		if err != nil {
@@ -66,7 +66,7 @@ func BuildStack() {
 				Name:  s.Name,
 			}
 
-			secretObj, err := client.Secret.Create(&createSecretParams)
+			secretObj, err := client.Client.Secret.Create(&createSecretParams)
 			if err != nil {
 				panic(err)
 			}
@@ -84,7 +84,7 @@ func BuildStack() {
 		if cc != nil {
 
 		} else {
-			collectionObj, err := client.Collection.Create(&v1.CreateCollectionParams{
+			collectionObj, err := client.Client.Collection.Create(&v1.CreateCollectionParams{
 				ProjectID: projectID,
 				Name:      collection.Name,
 				IndexType: collection.IndexType,
@@ -207,7 +207,7 @@ func BuildStack() {
 				Name:      gw.Name,
 			}
 
-			gatewayObj, err := client.Gateway.Update(&updateGatewayParams)
+			gatewayObj, err := client.Client.Gateway.Update(&updateGatewayParams)
 			if err != nil {
 				panic(err)
 			}
@@ -234,7 +234,7 @@ func BuildStack() {
 				Tags:      gw.Tags,
 			}
 
-			gatewayObj, err := client.Gateway.Create(&createGatewayParams)
+			gatewayObj, err := client.Client.Gateway.Create(&createGatewayParams)
 			if err != nil {
 				panic(err)
 			}

@@ -5,6 +5,7 @@ import (
 	"log"
 	"path"
 
+	"github.com/heeser-io/universe-cli/client"
 	v1 "github.com/heeser-io/universe/api/v1"
 )
 
@@ -19,7 +20,7 @@ func ReleaseFunction(functionID string) error {
 		FunctionID: functionID,
 	}
 
-	if err := client.Function.Release(&releaseParams); err != nil {
+	if err := client.Client.Function.Release(&releaseParams); err != nil {
 		return err
 	}
 
@@ -33,7 +34,7 @@ func UpdateFunction(params *UpdateAndUploadFunction) (*v1.Function, error) {
 		Tags:           []string{"functions"},
 		IsFunctionFile: true,
 	}
-	fileObj, err := client.File.Create(&fileParams)
+	fileObj, err := client.Client.File.Create(&fileParams)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,7 +50,7 @@ func UpdateFunction(params *UpdateAndUploadFunction) (*v1.Function, error) {
 		Checksum:   params.Checksum,
 	}
 
-	functionObj, err := client.Function.UpdateFile(&updateFunctionFileParams)
+	functionObj, err := client.Client.Function.UpdateFile(&updateFunctionFileParams)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +66,7 @@ func CreateFunction(params *v1.Function) (*v1.Function, error) {
 		Tags:           []string{"functions"},
 		IsFunctionFile: true,
 	}
-	fileObj, err := client.File.Create(&fileParams)
+	fileObj, err := client.Client.File.Create(&fileParams)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -86,7 +87,7 @@ func CreateFunction(params *v1.Function) (*v1.Function, error) {
 		Environment: params.Environment,
 	}
 
-	functionObj, err := client.Function.Create(&createFunctionParams)
+	functionObj, err := client.Client.Function.Create(&createFunctionParams)
 	if err != nil {
 		return nil, err
 	}

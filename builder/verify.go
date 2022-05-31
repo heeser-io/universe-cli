@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"github.com/heeser-io/universe-cli/client"
 	"github.com/heeser-io/universe-cli/config"
 	v1 "github.com/heeser-io/universe/api/v1"
 )
@@ -14,7 +15,7 @@ func HasChange() bool {
 func Verify() {
 	cache := LoadOrCreate()
 
-	p, err := client.Project.Read(&v1.ReadProjectParams{
+	p, err := client.Client.Project.Read(&v1.ReadProjectParams{
 		ProjectID: cache.Project.ID,
 	})
 	if err != nil {
@@ -27,7 +28,7 @@ func Verify() {
 			SecretID: secretObj.ID,
 		}
 
-		s, err := client.Secret.Read(readSecretParams)
+		s, err := client.Client.Secret.Read(readSecretParams)
 		if err != nil {
 			panic(err)
 		}
@@ -39,7 +40,7 @@ func Verify() {
 			CollectionID: collectionObj.ID,
 		}
 
-		c, err := client.Collection.Read(readCollectionParams)
+		c, err := client.Client.Collection.Read(readCollectionParams)
 		if err != nil {
 			panic(err)
 		}
@@ -51,7 +52,7 @@ func Verify() {
 			FunctionID: functionObj.ID,
 		}
 
-		f, err := client.Function.Read(readFunctionParams)
+		f, err := client.Client.Function.Read(readFunctionParams)
 		if err != nil {
 			panic(err)
 		}
@@ -64,7 +65,7 @@ func Verify() {
 			GatewayID: gatewayObj.ID,
 		}
 
-		g, err := client.Gateway.Read(readGatewayParams)
+		g, err := client.Client.Gateway.Read(readGatewayParams)
 		if err != nil {
 			panic(err)
 		}

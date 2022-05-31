@@ -2,6 +2,7 @@ package builder
 
 import (
 	"github.com/fatih/color"
+	"github.com/heeser-io/universe-cli/client"
 	v1 "github.com/heeser-io/universe/api/v1"
 )
 
@@ -10,7 +11,7 @@ func RemoveStack() {
 
 	// remove secrets
 	for _, s := range cache.Secrets {
-		if err := client.Secret.Delete(&v1.DeleteSecretParams{
+		if err := client.Client.Secret.Delete(&v1.DeleteSecretParams{
 			SecretID: s.ID,
 		}); err != nil {
 			panic(err)
@@ -20,7 +21,7 @@ func RemoveStack() {
 
 	// remove collections
 	for _, c := range cache.Collections {
-		if err := client.Collection.Delete(&v1.DeleteCollectionParams{
+		if err := client.Client.Collection.Delete(&v1.DeleteCollectionParams{
 			CollectionID: c.ID,
 		}); err != nil {
 			panic(err)
@@ -30,7 +31,7 @@ func RemoveStack() {
 
 	// remove functions
 	for _, f := range cache.Functions {
-		if err := client.Function.Delete(&v1.DeleteFunctionParams{
+		if err := client.Client.Function.Delete(&v1.DeleteFunctionParams{
 			FunctionID: f.ID,
 		}); err != nil {
 			panic(err)
@@ -40,7 +41,7 @@ func RemoveStack() {
 
 	// remove gateways
 	for _, g := range cache.Gateways {
-		if err := client.Gateway.Delete(&v1.DeleteGatewayParams{
+		if err := client.Client.Gateway.Delete(&v1.DeleteGatewayParams{
 			GatewayID: g.ID,
 		}); err != nil {
 			panic(err)
