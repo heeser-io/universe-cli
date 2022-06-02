@@ -16,6 +16,7 @@ type Cache struct {
 	Collections  map[string]*v1.Collection `yaml:"collections"`
 	Functions    map[string]*v1.Function   `yaml:"functions"`
 	Gateways     map[string]*v1.Gateway    `yaml:"gateways"`
+	OAuth        *v1.OAuth                 `yaml:"oauth"`
 }
 
 func LoadOrCreate() *Cache {

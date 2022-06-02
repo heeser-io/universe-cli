@@ -11,6 +11,7 @@ type Stack struct {
 	Project     string          `yaml:"project"`
 	Version     string          `yaml:"version"`
 	AutoRelease bool            `yaml:"auto_release"`
+	OAuth       v1.OAuth        `yaml:"oauth"`
 	Collections []v1.Collection `yaml:"collections"`
 	Functions   []v1.Function   `yaml:"functions"`
 	Gateways    []v1.Gateway    `yaml:"gateways"`

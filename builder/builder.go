@@ -54,6 +54,44 @@ func BuildStack() {
 
 	projectID := cache.Project.ID
 
+	// create oauth
+	co := cache.OAuth
+	if co != nil {
+		color.Yellow("oauth %s exists", co.ID)
+		updateOAuthParams := v1.UpdateOAuthParams{
+			OAuthID:      co.ID,
+			RedirectUrls: stack.OAuth.App.RedirectUrls,
+			LogoutUrls:   stack.OAuth.App.LogoutUrls,
+		}
+		oauthObj, err := client.Client.OAuth.Update(&updateOAuthParams)
+		if err != nil {
+			panic(err)
+		}
+
+		color.Green("successfully updated oauth %s", oauthObj.ID)
+
+		co = oauthObj
+		cache.OAuth = co
+	} else {
+		createOAuthParams := v1.CreateOAuthParams{
+			ProjectID:    projectID,
+			RedirectUrls: stack.OAuth.App.RedirectUrls,
+			LogoutUrls:   stack.OAuth.App.LogoutUrls,
+			AppName:      stack.OAuth.App.ClientName,
+			Tags:         stack.OAuth.Tags,
+		}
+
+		oauthObj, err := client.Client.OAuth.Create(&createOAuthParams)
+		if err != nil {
+			panic(err)
+		}
+
+		color.Green("successfully created oauth %s", oauthObj.ID)
+
+		co = oauthObj
+		cache.OAuth = co
+	}
+
 	for _, s := range stack.Secrets {
 		cg := cache.Secrets[s.Name]
 

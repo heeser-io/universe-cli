@@ -17,7 +17,9 @@ require (
 
 require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
+	github.com/PuerkitoBio/rehttp v1.1.0 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
+	github.com/auth0/go-auth0 v0.6.3 // indirect
 	github.com/aws/aws-sdk-go v1.44.9 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

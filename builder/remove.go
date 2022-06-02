@@ -9,6 +9,22 @@ import (
 func RemoveStack() {
 	cache := LoadOrCreate()
 
+	if err := client.Client.Project.Delete(&v1.DeleteProjectParams{
+		ProjectID: cache.Project.ID,
+	}); err != nil {
+		panic(err)
+	}
+
+	color.Green("successfully deleted project %s", cache.Project.ID)
+
+	// remove oauth
+	if err := client.Client.OAuth.Delete(&v1.DeleteOAuthParams{
+		OAuthID: cache.OAuth.ID,
+	}); err != nil {
+		panic(err)
+	}
+	color.Green("successfully deleted oauth %s", cache.Project.ID)
+
 	// remove secrets
 	for _, s := range cache.Secrets {
 		if err := client.Client.Secret.Delete(&v1.DeleteSecretParams{
@@ -26,7 +42,7 @@ func RemoveStack() {
 		}); err != nil {
 			panic(err)
 		}
-		color.Green("successfully deleted function %s", c.ID)
+		color.Green("successfully deleted collection %s", c.ID)
 	}
 
 	// remove functions

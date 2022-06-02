@@ -37,4 +37,5 @@ func Execute() {
 
 func init() {
 	rootCmd.AddCommand(StackCmd)
+	rootCmd.AddCommand(ProfileCmd)
 }
