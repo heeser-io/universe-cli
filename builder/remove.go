@@ -17,13 +17,15 @@ func RemoveStack() {
 
 	color.Green("successfully deleted project %s", cache.Project.ID)
 
-	// remove oauth
-	if err := client.Client.OAuth.Delete(&v1.DeleteOAuthParams{
-		OAuthID: cache.OAuth.ID,
-	}); err != nil {
-		panic(err)
+	if cache.OAuth != nil {
+		// remove oauth
+		if err := client.Client.OAuth.Delete(&v1.DeleteOAuthParams{
+			OAuthID: cache.OAuth.ID,
+		}); err != nil {
+			panic(err)
+		}
+		color.Green("successfully deleted oauth %s", cache.Project.ID)
 	}
-	color.Green("successfully deleted oauth %s", cache.Project.ID)
 
 	// remove secrets
 	for _, s := range cache.Secrets {

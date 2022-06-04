@@ -81,6 +81,7 @@ func CreateFunction(params *v1.Function) (*v1.Function, error) {
 		ProjectID:   params.ProjectID,
 		Checksum:    params.Checksum,
 		Handler:     params.Handler,
+		Permissions: params.Permissions,
 		FileID:      fileObj.ID,
 		Language:    params.Language,
 		Tags:        params.Tags,

@@ -23,13 +23,15 @@ func Verify() {
 	}
 	cache.Project = p
 
-	oauth, err := client.Client.OAuth.Read(&v1.ReadOAuthParams{
-		OAuthID: cache.OAuth.ID,
-	})
-	if err != nil {
-		panic(err)
+	if cache.OAuth != nil {
+		oauth, err := client.Client.OAuth.Read(&v1.ReadOAuthParams{
+			OAuthID: cache.OAuth.ID,
+		})
+		if err != nil {
+			panic(err)
+		}
+		cache.OAuth = oauth
 	}
-	cache.OAuth = oauth
 
 	for _, secretObj := range cache.Secrets {
 		readSecretParams := &v1.ReadSecretParams{
