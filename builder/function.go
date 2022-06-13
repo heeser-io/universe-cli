@@ -86,6 +86,7 @@ func CreateFunction(params *v1.Function) (*v1.Function, error) {
 		Language:    params.Language,
 		Tags:        params.Tags,
 		Environment: params.Environment,
+		BaseImage:   params.BaseImage,
 	}
 
 	functionObj, err := client.Client.Function.Create(&createFunctionParams)

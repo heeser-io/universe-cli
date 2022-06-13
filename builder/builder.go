@@ -42,6 +42,10 @@ func BuildStack() {
 		cache.Secrets = make(map[string]*v1.Secret)
 	}
 
+	if cache.Tasks == nil {
+		cache.Tasks = make(map[string]*v1.Task)
+	}
+
 	if cache.Project == nil {
 		projectObj, err := client.Client.Project.Create(&v1.CreateProjectParams{
 			Name: stack.Project,
@@ -99,7 +103,7 @@ func BuildStack() {
 		cg := cache.Secrets[s.Name]
 
 		if cg != nil {
-			color.Yellow("secret %s exists", s.ID)
+			color.Yellow("secret %s exists", s.Name)
 		} else {
 			createSecretParams := v1.CreateSecretParams{
 				Value: s.Value,
@@ -195,6 +199,7 @@ func BuildStack() {
 					Checksum:    checksum,
 					ProjectID:   projectID,
 					Permissions: function.Permissions,
+					BaseImage:   function.BaseImage,
 					Name:        function.Name,
 					Tags:        function.Tags,
 					Language:    function.Language,
@@ -286,6 +291,29 @@ func BuildStack() {
 			cg = gatewayObj
 		}
 		cache.Gateways[gw.Name] = cg
+	}
+
+	for _, t := range stack.Tasks {
+		ct := cache.Tasks[t.Name]
+
+		if ct != nil {
+			color.Yellow("task %s exists", ct.Name)
+		} else {
+			createTaskParams := v1.CreateTaskParams{
+				Name:       t.Name,
+				Tags:       t.Tags,
+				FunctionID: cache.Functions[t.FunctionID].ID,
+				Interval:   t.Interval,
+				ProjectID:  projectID,
+			}
+			taskObj, err := client.Client.Task.Create(&createTaskParams)
+			if err != nil {
+				panic(err)
+			}
+			color.Green("successfully created task %s", taskObj.ID)
+			ct = taskObj
+			cache.Tasks[ct.Name] = ct
+		}
 	}
 
 	// save cache after everything is done
