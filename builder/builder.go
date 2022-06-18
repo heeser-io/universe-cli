@@ -18,13 +18,18 @@ var (
 	API_KEY string
 )
 
-func BuildStack() {
+func GetStackFile() string {
 	sf := config.Main.GetString("stackFile")
 
 	if funk.IsZero(sf) {
 		sf = "universe.yml"
 	}
-	stack := ReadStack(sf)
+
+	return sf
+}
+func BuildStack() {
+
+	stack := ReadStack(GetStackFile())
 
 	// Check if we already have created a function
 	// Check old filehash vs new filehash

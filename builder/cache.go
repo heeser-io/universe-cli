@@ -22,12 +22,17 @@ type Cache struct {
 	Tasks        map[string]*v1.Task       `yaml:"tasks"`
 }
 
-func LoadOrCreate() *Cache {
+func getCacheFile() string {
 	cf := config.Main.GetString("cacheFile")
 	if funk.IsZero(cf) {
 		cf = ".stack.yml"
 	}
-	fb, err := os.ReadFile(cf)
+
+	return cf
+}
+func LoadOrCreate() *Cache {
+
+	fb, err := os.ReadFile(getCacheFile())
 
 	create := false
 	if err != nil {
@@ -49,7 +54,7 @@ func (c *Cache) Save() {
 	if err != nil {
 		panic(err)
 	}
-	if err := os.WriteFile(config.Main.GetString("cacheFile"), b, os.ModePerm); err != nil {
+	if err := os.WriteFile(getCacheFile(), b, os.ModePerm); err != nil {
 		panic(err)
 	}
 }

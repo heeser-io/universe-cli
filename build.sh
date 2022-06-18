@@ -5,7 +5,7 @@ env GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o bin/macos/universe
 env GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o bin/macos-silicon/universe
 
 # build for linux x64
-env GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o bin/linux64/universe
+env GOOS=linux GOARCH=amd64 go build -o bin/linux64/universe
 env GOOS=linux GOARCH=386 go build -ldflags="-s -w" -o bin/linux32/universe
 
 # build for windows x64

@@ -27,6 +27,13 @@ func main() {
 
 	if funk.IsZero(apiKey) {
 		apiKey = os.Getenv("UNIVERSE_API_KEY")
+
+		if !funk.IsZero(apiKey) {
+			config.Main.Set("apiKey", apiKey)
+			if err := config.Main.WriteConfig(); err != nil {
+				panic(err)
+			}
+		}
 	}
 
 	if funk.IsZero(apiKey) {

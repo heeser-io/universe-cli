@@ -2,14 +2,13 @@ package builder
 
 import (
 	"github.com/heeser-io/universe-cli/client"
-	"github.com/heeser-io/universe-cli/config"
 	v1 "github.com/heeser-io/universe/api/v1"
 )
 
 func HasChange() bool {
 	cache := LoadOrCreate()
 
-	cs := Checksum(config.Main.GetString("stackFile"))
+	cs := Checksum(GetStackFile())
 	return cs != cache.Checksum
 }
 func Verify() {
@@ -81,7 +80,7 @@ func Verify() {
 		}
 		cache.Gateways[g.Name] = gatewayObj
 	}
-	cs := Checksum(config.Main.GetString("stackFile"))
+	cs := Checksum(GetStackFile())
 	cache.Checksum = cs
 	cache.Save()
 
