@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/heeser-io/universe-cli/cmd/function"
+	"github.com/heeser-io/universe-cli/cmd/project"
 	"github.com/spf13/cobra"
 )
 
@@ -25,4 +27,6 @@ func Execute() {
 func init() {
 	rootCmd.AddCommand(StackCmd)
 	rootCmd.AddCommand(ProfileCmd)
+	rootCmd.AddCommand(project.ProjectCmd)
+	rootCmd.AddCommand(function.FunctionCmd)
 }
