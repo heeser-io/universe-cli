@@ -112,10 +112,4 @@ require (
 	github.com/spf13/viper v1.11.0
 )
 
-replace github.com/heeser-io/file-cdn v0.0.0 => /Users/yannheeser/Dev/heeser-io/file-cdn
-
-replace github.com/heeser-io/functions v0.0.0 => /Users/yannheeser/Dev/heeser-io/functions
-
-replace github.com/heeser-io/api-gateway v0.0.0 => /Users/yannheeser/Dev/heeser-io/api-gateway
-
 replace github.com/heeser-io/universe v0.0.0 => /Users/yannheeser/Dev/heeser-io/universe-kubernetes
