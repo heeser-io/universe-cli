@@ -11,6 +11,7 @@ import (
 	"github.com/heeser-io/universe-cli/config"
 	v1 "github.com/heeser-io/universe/api/v1"
 	"github.com/heeser-io/universe/services/gateway"
+	"github.com/thoas/go-funk"
 )
 
 var (
@@ -18,7 +19,12 @@ var (
 )
 
 func BuildStack() {
-	stack := ReadStack(config.Main.GetString("stackFile"))
+	sf := config.Main.GetString("stackFile")
+
+	if funk.IsZero(sf) {
+		sf = "universe.yml"
+	}
+	stack := ReadStack(sf)
 
 	// Check if we already have created a function
 	// Check old filehash vs new filehash

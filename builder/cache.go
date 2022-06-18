@@ -5,6 +5,7 @@ import (
 
 	"github.com/heeser-io/universe-cli/config"
 	v1 "github.com/heeser-io/universe/api/v1"
+	"github.com/thoas/go-funk"
 	"gopkg.in/yaml.v2"
 )
 
@@ -22,7 +23,11 @@ type Cache struct {
 }
 
 func LoadOrCreate() *Cache {
-	fb, err := os.ReadFile(config.Main.GetString("cacheFile"))
+	cf := config.Main.GetString("cacheFile")
+	if funk.IsZero(cf) {
+		cf = ".stack.yml"
+	}
+	fb, err := os.ReadFile(cf)
 
 	create := false
 	if err != nil {

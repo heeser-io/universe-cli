@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"os"
 
 	"github.com/heeser-io/universe-cli/client"
 	"github.com/heeser-io/universe-cli/cmd"
@@ -23,6 +24,11 @@ func main() {
 		}
 		return nil
 	}
+
+	if funk.IsZero(apiKey) {
+		apiKey = os.Getenv("UNIVERSE_API_KEY")
+	}
+
 	if funk.IsZero(apiKey) {
 		prompt := promptui.Prompt{
 			Label:    "apiKey",
