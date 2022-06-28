@@ -15,13 +15,15 @@ var (
 	CreateCmd = &cobra.Command{
 		Use:   "create",
 		Short: "creates a project with the given params",
+		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			projectObj, err := client.Client.Project.Create(&v1.CreateProjectParams{
-				Name: Name,
+				Name: args[0],
 				Tags: *Tags,
 			})
 			if err != nil {
 				color.Red("err:%v\n", err)
+				return
 			}
 			fmt.Println(string(v1.StructToByte(projectObj)))
 		},
@@ -29,6 +31,5 @@ var (
 )
 
 func init() {
-	CreateCmd.Flags().StringVar(&Name, "name", "", "name of the project")
 	Tags = CreateCmd.Flags().StringArray("tags", nil, "tags of the project")
 }

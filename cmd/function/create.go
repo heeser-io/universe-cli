@@ -10,15 +10,15 @@ import (
 )
 
 var (
-	Name      string
 	Tags      *[]string
 	CreateCmd = &cobra.Command{
-		Use:   "create",
+		Use:   "create name [--tags]",
 		Short: "creates a function with the given params",
+		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			functionObj, err := client.Client.Function.Create(&v1.CreateFunctionParams{
 				ProjectID: ProjectID,
-				Name:      Name,
+				Name:      args[0],
 				Tags:      *Tags,
 			})
 			if err != nil {
@@ -30,6 +30,5 @@ var (
 )
 
 func init() {
-	CreateCmd.Flags().StringVar(&Name, "name", "", "name of the function")
 	Tags = CreateCmd.Flags().StringArray("tags", nil, "tags of the function")
 }

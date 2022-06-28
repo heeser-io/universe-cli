@@ -10,6 +10,7 @@ import (
 )
 
 var (
+	Name      string
 	UpdateCmd = &cobra.Command{
 		Use:   "update",
 		Short: "updates a function with the given params",

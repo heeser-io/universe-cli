@@ -65,6 +65,7 @@ func BuildStack() {
 			panic(err)
 		}
 		cache.Project = projectObj
+		color.Green("successfully created project %s", projectObj.ID)
 	}
 
 	projectID := cache.Project.ID

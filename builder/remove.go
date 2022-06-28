@@ -12,7 +12,7 @@ func RemoveStack() {
 	if err := client.Client.Project.Delete(&v1.DeleteProjectParams{
 		ProjectID: cache.Project.ID,
 	}); err != nil {
-		panic(err)
+		// panic(err)
 	}
 
 	color.Green("successfully deleted project %s", cache.Project.ID)

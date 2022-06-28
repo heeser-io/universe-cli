@@ -19,5 +19,6 @@ func init() {
 	FunctionCmd.AddCommand(CreateCmd)
 	FunctionCmd.AddCommand(ReadCmd)
 	FunctionCmd.AddCommand(UpdateCmd)
+	FunctionCmd.AddCommand(DeleteCmd)
 	FunctionCmd.AddCommand(ListCmd)
 }

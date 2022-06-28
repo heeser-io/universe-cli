@@ -17,6 +17,7 @@ var (
 			})
 			if err != nil {
 				color.Red("err:%v\n", err)
+				return
 			}
 			color.Green("successfully deleted project %s", ProjectID)
 		},
