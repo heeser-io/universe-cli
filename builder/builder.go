@@ -310,6 +310,18 @@ func BuildStack() {
 
 		if ct != nil {
 			color.Yellow("task %s exists", ct.Name)
+			updateTaskParams := v1.UpdateTaskParams{
+				TaskID:     ct.ID,
+				FunctionID: cache.Functions[t.FunctionID].ID,
+				Interval:   t.Interval,
+			}
+			taskObj, err := client.Client.Task.Update(&updateTaskParams)
+			if err != nil {
+				panic(err)
+			}
+			color.Green("successfully updated task %s", taskObj.ID)
+			ct = taskObj
+			cache.Tasks[ct.Name] = ct
 		} else {
 			createTaskParams := v1.CreateTaskParams{
 				Name:       t.Name,

@@ -12,10 +12,10 @@ func RemoveStack() {
 	if err := client.Client.Project.Delete(&v1.DeleteProjectParams{
 		ProjectID: cache.Project.ID,
 	}); err != nil {
-		// panic(err)
+		color.Red("no project with %s ", cache.Project.ID)
+	} else {
+		color.Green("successfully deleted project %s", cache.Project.ID)
 	}
-
-	color.Green("successfully deleted project %s", cache.Project.ID)
 
 	if cache.OAuth != nil {
 		// remove oauth
