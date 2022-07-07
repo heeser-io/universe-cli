@@ -196,14 +196,25 @@ func BuildStack() {
 				}
 			} else {
 				// Create function
-				environment := []string{}
 
-				for _, e := range function.Environment {
-					s := cache.Secrets[e]
-					if s == nil {
-						panic(fmt.Sprintf("secret %s not found", e))
+				environment := function.Environment
+
+				if funk.IsZero(environment) {
+					environment = map[string]string{}
+				}
+
+				for k, v := range environment {
+					if strings.Contains(v, "secret:") {
+						s := strings.Split(v, ":")
+						if len(s) == 2 {
+							secretObj := cache.Secrets[s[1]]
+							if secretObj != nil {
+								environment[k] = fmt.Sprintf("secret:%s", secretObj.ID)
+							}
+						}
+					} else {
+						environment[k] = v
 					}
-					environment = append(environment, s.ID)
 				}
 				functionObj, err := CreateFunction(&v1.Function{
 					Path:        function.Path,
@@ -310,9 +321,21 @@ func BuildStack() {
 
 		if ct != nil {
 			color.Yellow("task %s exists", ct.Name)
+
+			functionID := t.FunctionID
+
+			if strings.Contains(t.FunctionID, "function:") {
+				s := strings.Split(t.FunctionID, ":")
+				if len(s) == 2 {
+					functionID = s[1]
+				} else {
+					panic("wrong format")
+				}
+			}
+
 			updateTaskParams := v1.UpdateTaskParams{
 				TaskID:     ct.ID,
-				FunctionID: cache.Functions[t.FunctionID].ID,
+				FunctionID: cache.Functions[functionID].ID,
 				Interval:   t.Interval,
 			}
 			taskObj, err := client.Client.Task.Update(&updateTaskParams)
@@ -323,10 +346,21 @@ func BuildStack() {
 			ct = taskObj
 			cache.Tasks[ct.Name] = ct
 		} else {
+			functionID := t.FunctionID
+
+			if strings.Contains(t.FunctionID, "secret:") {
+				s := strings.Split(t.FunctionID, ":")
+				if len(s) == 2 {
+					functionID = s[1]
+				} else {
+					panic("wrong format")
+				}
+			}
+
 			createTaskParams := v1.CreateTaskParams{
 				Name:       t.Name,
 				Tags:       t.Tags,
-				FunctionID: cache.Functions[t.FunctionID].ID,
+				FunctionID: cache.Functions[functionID].ID,
 				Interval:   t.Interval,
 				ProjectID:  projectID,
 			}
