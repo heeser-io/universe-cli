@@ -67,5 +67,14 @@ func RemoveStack() {
 		color.Green("successfully deleted gateway %s", g.ID)
 	}
 
+	for _, t := range cache.Tasks {
+		if err := client.Client.Task.Delete(&v1.DeleteTaskParams{
+			TaskID: t.ID,
+		}); err != nil {
+			panic(err)
+		}
+		color.Green("successfully deleted task %s", t.ID)
+	}
+
 	// make a backup of .stack.yml for later recovery
 }

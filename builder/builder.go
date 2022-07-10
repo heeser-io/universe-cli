@@ -160,7 +160,7 @@ func BuildStack() {
 	for _, function := range stack.Functions {
 		wg.Add(1)
 		go func(function v1.Function) {
-			checksum := Checksum(strings.Split(function.Path, ".zip")[0])
+			checksum := Checksum(function.Path)
 			// functions
 			cf := cache.Functions[function.Name]
 			if cf != nil {
@@ -325,7 +325,7 @@ func BuildStack() {
 			functionID := t.FunctionID
 
 			if strings.Contains(t.FunctionID, "function:") {
-				s := strings.Split(t.FunctionID, ":")
+				s := strings.Split(t.FunctionID, "function:")
 				if len(s) == 2 {
 					functionID = s[1]
 				} else {
@@ -348,8 +348,8 @@ func BuildStack() {
 		} else {
 			functionID := t.FunctionID
 
-			if strings.Contains(t.FunctionID, "secret:") {
-				s := strings.Split(t.FunctionID, ":")
+			if strings.Contains(t.FunctionID, "function:") {
+				s := strings.Split(t.FunctionID, "function:")
 				if len(s) == 2 {
 					functionID = s[1]
 				} else {
