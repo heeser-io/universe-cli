@@ -10,9 +10,11 @@ import (
 )
 
 type UpdateAndUploadFunction struct {
-	FunctionID string
-	Filepath   string
-	Checksum   string
+	FunctionID  string
+	Filepath    string
+	Checksum    string
+	Tags        []string
+	Environment map[string]string
 }
 
 func ReleaseFunction(functionID string) error {
@@ -27,11 +29,12 @@ func ReleaseFunction(functionID string) error {
 	return nil
 }
 
-func UpdateFunction(params *UpdateAndUploadFunction) (*v1.Function, error) {
+func UpdateFunction(params *v1.UpdateFunctionParams) (*v1.Function, error) {
 	fileParams := v1.CreateFileParams{
-		Filename:       path.Base(params.Filepath),
+		Filename:       path.Base(params.Path),
 		Name:           fmt.Sprintf("function %s", params.FunctionID),
 		Tags:           []string{"functions"},
+		Checksum:       *params.Checksum,
 		IsFunctionFile: true,
 	}
 	fileObj, err := client.Client.File.Create(&fileParams)
@@ -39,18 +42,14 @@ func UpdateFunction(params *UpdateAndUploadFunction) (*v1.Function, error) {
 		log.Fatal(err)
 	}
 
-	if err := fileObj.Upload(params.Filepath); err != nil {
+	if err := fileObj.Upload(params.Path); err != nil {
 		log.Fatal(err)
 	}
 	fileObj.SignedUploadUrl = ""
 
-	updateFunctionFileParams := v1.UpdateFunctionFileParams{
-		FunctionID: params.FunctionID,
-		FileID:     fileObj.ID,
-		Checksum:   params.Checksum,
-	}
+	params.FileID = &fileObj.ID
 
-	functionObj, err := client.Client.Function.UpdateFile(&updateFunctionFileParams)
+	functionObj, err := client.Client.Function.Update(params)
 	if err != nil {
 		return nil, err
 	}
@@ -65,6 +64,7 @@ func CreateFunction(params *v1.Function) (*v1.Function, error) {
 		Description:    fmt.Sprintf("file for the function %s", params.Name),
 		Tags:           []string{"functions"},
 		IsFunctionFile: true,
+		Checksum:       params.Checksum,
 	}
 	fileObj, err := client.Client.File.Create(&fileParams)
 	if err != nil {

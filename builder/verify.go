@@ -80,6 +80,19 @@ func Verify() {
 		}
 		cache.Gateways[g.Name] = gatewayObj
 	}
+
+	for _, taskObj := range cache.Tasks {
+		readTaskParams := &v1.ReadTaskParams{
+			TaskID: taskObj.ID,
+		}
+
+		t, err := client.Client.Task.Read(readTaskParams)
+		if err != nil {
+			panic(err)
+		}
+		cache.Tasks[t.Name] = t
+	}
+
 	cs := Checksum(GetStackFile())
 	cache.Checksum = cs
 	cache.Save()

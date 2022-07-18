@@ -18,7 +18,7 @@ type Cache struct {
 	Functions    map[string]*v1.Function   `yaml:"functions"`
 	Gateways     map[string]*v1.Gateway    `yaml:"gateways"`
 	OAuth        *v1.OAuth                 `yaml:"oauth"`
-	Files        map[string]*v1.File       `yaml:"files"`
+	Filemappings map[string][]v1.File      `yaml:"filemappings"`
 	Tasks        map[string]*v1.Task       `yaml:"tasks"`
 }
 

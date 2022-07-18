@@ -2,47 +2,56 @@ package builder
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	"github.com/heeser-io/universe-cli/config"
 	v1 "github.com/heeser-io/universe/api/v1"
 	"github.com/heeser-io/universe/services/gateway"
 	"github.com/thoas/go-funk"
 )
 
-var (
-	API_KEY string
-)
+type Buildable interface {
+	Exists() bool
+	Create() error
+	Update() error
+	Delete() error
+}
 
-func GetStackFile() string {
-	sf := config.Main.GetString("stackFile")
+type Builder struct {
+	cache *Cache
+	stack *Stack
+}
 
-	if funk.IsZero(sf) {
-		sf = "universe.yml"
+func New() *Builder {
+	stack := ReadStack(GetStackFile())
+	cache := LoadOrCreate()
+
+	if cache.Project == nil {
+		projectObj, err := client.Client.Project.Create(&v1.CreateProjectParams{
+			Name: stack.Project.Name,
+			Tags: stack.Project.Tags,
+		})
+		if err != nil {
+			panic(err)
+		}
+		cache.Project = projectObj
+		color.Green("successfully created project %s", projectObj.ID)
 	}
 
-	return sf
-}
-func BuildStack() {
-
-	stack := ReadStack(GetStackFile())
-
-	// Check if we already have created a function
-	// Check old filehash vs new filehash
-	// create if none, update if differs, do nothing if its the same
-
-	// load cache
-	cache := LoadOrCreate()
 	if cache.Functions == nil {
 		cache.Functions = make(map[string]*v1.Function)
 	}
 
 	if cache.Gateways == nil {
 		cache.Gateways = make(map[string]*v1.Gateway)
+	}
+
+	if cache.Functions == nil {
+		cache.Functions = make(map[string]*v1.Function)
 	}
 
 	if cache.Collections == nil {
@@ -57,133 +66,87 @@ func BuildStack() {
 		cache.Tasks = make(map[string]*v1.Task)
 	}
 
-	if cache.Project == nil {
-		projectObj, err := client.Client.Project.Create(&v1.CreateProjectParams{
-			Name: stack.Project,
-		})
-		if err != nil {
-			panic(err)
-		}
-		cache.Project = projectObj
-		color.Green("successfully created project %s", projectObj.ID)
+	if cache.Filemappings == nil {
+		cache.Filemappings = make(map[string][]v1.File)
 	}
 
-	projectID := cache.Project.ID
+	cache.Save()
 
-	// create oauth
-	co := cache.OAuth
-
-	if stack.OAuth.App.ClientName != "" {
-		if co != nil {
-			color.Yellow("oauth %s exists", co.ID)
-			updateOAuthParams := v1.UpdateOAuthParams{
-				OAuthID:      co.ID,
-				RedirectUrls: stack.OAuth.App.RedirectUrls,
-				LogoutUrls:   stack.OAuth.App.LogoutUrls,
-			}
-			oauthObj, err := client.Client.OAuth.Update(&updateOAuthParams)
-			if err != nil {
-				panic(err)
-			}
-
-			color.Green("successfully updated oauth %s", oauthObj.ID)
-
-			co = oauthObj
-			cache.OAuth = co
-		} else {
-			createOAuthParams := v1.CreateOAuthParams{
-				ProjectID:    projectID,
-				RedirectUrls: stack.OAuth.App.RedirectUrls,
-				LogoutUrls:   stack.OAuth.App.LogoutUrls,
-				AppName:      stack.OAuth.App.ClientName,
-				Tags:         stack.OAuth.Tags,
-			}
-
-			oauthObj, err := client.Client.OAuth.Create(&createOAuthParams)
-			if err != nil {
-				panic(err)
-			}
-
-			color.Green("successfully created oauth %s", oauthObj.ID)
-
-			co = oauthObj
-			cache.OAuth = co
-		}
+	return &Builder{
+		cache: cache,
+		stack: stack,
 	}
+}
 
-	for _, s := range stack.Secrets {
-		cg := cache.Secrets[s.Name]
-
-		if cg != nil {
-			color.Yellow("secret %s exists", s.Name)
-		} else {
-			createSecretParams := v1.CreateSecretParams{
-				Value: s.Value,
-				Tags:  s.Tags,
-				Name:  s.Name,
-			}
-
-			secretObj, err := client.Client.Secret.Create(&createSecretParams)
-			if err != nil {
-				panic(err)
-			}
-
-			color.Green("successfully created secret %s", secretObj.ID)
-
-			cg = secretObj
-			cache.Secrets[cg.Name] = cg
-		}
+// returns the projectID of the project
+func (b *Builder) getProjectID() string {
+	if b.cache == nil || b.cache.Project == nil {
+		panic("no project in current stack")
 	}
+	return b.cache.Project.ID
+}
 
-	for _, collection := range stack.Collections {
-		cc := cache.Collections[collection.Name]
+// buildFunctions will try to create or update all functions in the current stack
+func (b *Builder) buildFunctions() error {
+	cache := b.cache
+	stack := b.stack
 
-		if cc != nil {
-
-		} else {
-			collectionObj, err := client.Client.Collection.Create(&v1.CreateCollectionParams{
-				ProjectID: projectID,
-				Name:      collection.Name,
-				IndexType: collection.IndexType,
-			})
-			if err != nil {
-				panic(err)
-			}
-			cc = collectionObj
-			cache.Collections[collection.Name] = cc
-		}
-	}
+	projectID := b.getProjectID()
 
 	// push functions in parallel
 	wg := sync.WaitGroup{}
 
 	for _, function := range stack.Functions {
 		wg.Add(1)
-		go func(function v1.Function) {
+		go func(function v1.Function) error {
 			checksum := Checksum(function.Path)
 			// functions
 			cf := cache.Functions[function.Name]
+			environment := function.Environment
+
+			if funk.IsZero(environment) {
+				environment = map[string]string{}
+			}
+
+			for k, v := range environment {
+				if strings.Contains(v, "secret:") {
+					s := strings.Split(v, ":")
+					if len(s) == 2 {
+						secretObj := cache.Secrets[s[1]]
+						if secretObj != nil {
+							environment[k] = fmt.Sprintf("secret:%s", secretObj.ID)
+						}
+					}
+				} else {
+					environment[k] = v
+				}
+			}
+
 			if cf != nil {
+				// update file and function
 
 				if checksum != cf.Checksum {
-					// update file and function
-					functionObj, err := UpdateFunction(&UpdateAndUploadFunction{
-						FunctionID: cf.ID,
-						Filepath:   function.Path,
-						Checksum:   checksum,
+					functionObj, err := UpdateFunction(&v1.UpdateFunctionParams{
+						FunctionID:  cf.ID,
+						Path:        function.Path,
+						Checksum:    &checksum,
+						Name:        function.Name,
+						Environment: environment,
+						Tags:        function.Tags,
 					})
-
-					color.Green("successfully updated function %s (%s) to version %d", functionObj.Name, functionObj.ID, functionObj.Version)
 					if err != nil {
-						panic(err)
+						color.Red("cannot update function %s, reason: %s", function.Name, err.Error())
+						return err
 					}
+					color.Green("successfully updated function %s (%s)", functionObj.Name, functionObj.ID)
 
 					// release function
 					if err := ReleaseFunction(functionObj.ID); err != nil {
-						panic(err)
+						color.Red("cannot release function %s, reason: %s", function.Name, err.Error())
+						return err
 					}
 
-					color.Green("successfully released function %s (%s) with version %d", functionObj.Name, functionObj.ID, functionObj.Version)
+					color.Green("successfully released function %s (%s)", functionObj.Name, functionObj.ID)
 
 					now := time.Now().Format(time.RFC3339)
 					cf.LastReleasedAt = now
@@ -196,26 +159,6 @@ func BuildStack() {
 				}
 			} else {
 				// Create function
-
-				environment := function.Environment
-
-				if funk.IsZero(environment) {
-					environment = map[string]string{}
-				}
-
-				for k, v := range environment {
-					if strings.Contains(v, "secret:") {
-						s := strings.Split(v, ":")
-						if len(s) == 2 {
-							secretObj := cache.Secrets[s[1]]
-							if secretObj != nil {
-								environment[k] = fmt.Sprintf("secret:%s", secretObj.ID)
-							}
-						}
-					} else {
-						environment[k] = v
-					}
-				}
 				functionObj, err := CreateFunction(&v1.Function{
 					Path:        function.Path,
 					Handler:     function.Handler,
@@ -230,7 +173,7 @@ func BuildStack() {
 				})
 				if err != nil {
 					color.Red("cannot create function %s, reason: %s", function.Name, err.Error())
-					panic(err)
+					return err
 				}
 
 				color.Green("successfully created function %s (%s)", functionObj.Name, functionObj.ID)
@@ -239,7 +182,8 @@ func BuildStack() {
 
 				// release function
 				if err := ReleaseFunction(functionObj.ID); err != nil {
-					panic(err)
+					color.Red("cannot release function %s, reason: %s", function.Name, err.Error())
+					return err
 				}
 				cf.LastReleasedAt = time.Now().Format(time.RFC3339)
 				cache.Functions[functionObj.Name] = cf
@@ -248,11 +192,21 @@ func BuildStack() {
 				cache.LastUploaded = time.Now().Format(time.RFC3339)
 				wg.Done()
 			}
+			return nil
 		}(function)
 	}
 
 	wg.Wait()
+
 	cache.Save()
+	return nil
+}
+
+// buildGateways will try to create or update all gateways in the current stack
+func (b *Builder) buildGateways() error {
+	cache := b.cache
+	stack := b.stack
+	projectID := b.getProjectID()
 
 	for _, gw := range stack.Gateways {
 		cg := cache.Gateways[gw.Name]
@@ -316,6 +270,17 @@ func BuildStack() {
 		cache.Gateways[gw.Name] = cg
 	}
 
+	cache.Save()
+	return nil
+}
+
+// buildTasks will try to create or update all tasks in the current stack
+func (b *Builder) buildTasks() error {
+	cache := b.cache
+	stack := b.stack
+
+	projectID := b.getProjectID()
+
 	for _, t := range stack.Tasks {
 		ct := cache.Tasks[t.Name]
 
@@ -374,6 +339,153 @@ func BuildStack() {
 		}
 	}
 
-	// save cache after everything is done
 	cache.Save()
+	return nil
+}
+
+// buildSecrets will try to create or update all secrets in the current stack
+func (b *Builder) buildSecrets() error {
+	cache := b.cache
+	stack := b.stack
+
+	projectID := b.getProjectID()
+
+	for _, s := range stack.Secrets {
+		cg := cache.Secrets[s.Name]
+
+		if cg != nil {
+			color.Yellow("secret %s exists", s.Name)
+		} else {
+			createSecretParams := v1.CreateSecretParams{
+				ProjectID: projectID,
+				Value:     s.Value,
+				Tags:      s.Tags,
+				Name:      s.Name,
+			}
+
+			secretObj, err := client.Client.Secret.Create(&createSecretParams)
+			if err != nil {
+				panic(err)
+			}
+
+			color.Green("successfully created secret %s", secretObj.ID)
+
+			cg = secretObj
+			cache.Secrets[cg.Name] = cg
+		}
+	}
+	cache.Save()
+	return nil
+}
+
+// buildOAuth will try to create or update the oauth provider if it exists in the stack
+func (b *Builder) buildOAuth() error {
+	cache := b.cache
+	stack := b.stack
+
+	projectID := b.getProjectID()
+
+	co := cache.OAuth
+
+	if stack.OAuth.App.ClientName != "" {
+		if co != nil {
+			color.Yellow("oauth %s exists", co.ID)
+			updateOAuthParams := v1.UpdateOAuthParams{
+				OAuthID:      co.ID,
+				RedirectUrls: stack.OAuth.App.RedirectUrls,
+				LogoutUrls:   stack.OAuth.App.LogoutUrls,
+			}
+			oauthObj, err := client.Client.OAuth.Update(&updateOAuthParams)
+			if err != nil {
+				panic(err)
+			}
+
+			color.Green("successfully updated oauth %s", oauthObj.ID)
+
+			co = oauthObj
+			cache.OAuth = co
+		} else {
+			createOAuthParams := v1.CreateOAuthParams{
+				ProjectID:    projectID,
+				RedirectUrls: stack.OAuth.App.RedirectUrls,
+				LogoutUrls:   stack.OAuth.App.LogoutUrls,
+				AppName:      stack.OAuth.App.ClientName,
+				Tags:         stack.OAuth.Tags,
+			}
+
+			oauthObj, err := client.Client.OAuth.Create(&createOAuthParams)
+			if err != nil {
+				panic(err)
+			}
+
+			color.Green("successfully created oauth %s", oauthObj.ID)
+
+			co = oauthObj
+			cache.OAuth = co
+		}
+	}
+	cache.Save()
+	return nil
+}
+
+// buildCollections will try to create or update all collections in the current stack
+func (b *Builder) buildCollections() error {
+	cache := b.cache
+	stack := b.stack
+
+	projectID := b.getProjectID()
+
+	for _, collection := range stack.Collections {
+		cc := cache.Collections[collection.Name]
+
+		if cc != nil {
+
+		} else {
+			collectionObj, err := client.Client.Collection.Create(&v1.CreateCollectionParams{
+				ProjectID: projectID,
+				Name:      collection.Name,
+				IndexType: collection.IndexType,
+			})
+			if err != nil {
+				panic(err)
+			}
+			cc = collectionObj
+			cache.Collections[collection.Name] = cc
+		}
+	}
+	cache.Save()
+	return nil
+}
+
+func (b *Builder) buildFiles() error {
+	cache := b.cache
+	stack := b.stack
+
+	for _, filemapping := range stack.Filemapping {
+
+		if cache.Filemappings[filemapping.Name] != nil {
+
+		} else {
+			files, err := filemapping.Upload(cache.Project.ID)
+			if err != nil {
+				log.Println(err)
+				return err
+			}
+			cache.Filemappings[filemapping.Name] = files
+		}
+	}
+	cache.Save()
+	return nil
+}
+
+func BuildStack() {
+	builder := New()
+
+	builder.buildSecrets()
+	builder.buildOAuth()
+	builder.buildCollections()
+	builder.buildFunctions()
+	builder.buildGateways()
+	builder.buildTasks()
+	builder.buildFiles()
 }
