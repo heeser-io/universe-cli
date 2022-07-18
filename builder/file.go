@@ -5,7 +5,9 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
+	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
 	v1 "github.com/heeser-io/universe/api/v1"
 )
@@ -17,8 +19,8 @@ type Filemapping struct {
 	Tags  []string
 }
 
-func (fm *Filemapping) Upload(projectID string) ([]v1.File, error) {
-	files := []v1.File{}
+func (fm *Filemapping) Upload(projectID string) ([]*v1.File, error) {
+	files := []*v1.File{}
 
 	fileInfo, err := os.Stat(fm.Path)
 	if err != nil {
@@ -37,6 +39,20 @@ func (fm *Filemapping) Upload(projectID string) ([]v1.File, error) {
 					return err
 				}
 
+				cs := Checksum(p)
+
+				var eFile *v1.File
+				for _, f := range fm.Files {
+					if strings.Contains(f.Ref.Key, path.Join(p)) {
+						eFile = f
+					}
+				}
+
+				if eFile != nil && eFile.Checksum == cs {
+					return nil
+				}
+
+				color.Yellow("uploading file %s...", p)
 				fileRes, err := client.Client.File.RawUpload(&v1.UploadAndCreateParams{
 					Path: dir,
 					Files: map[string]*os.File{
@@ -49,6 +65,7 @@ func (fm *Filemapping) Upload(projectID string) ([]v1.File, error) {
 				if err != nil {
 					return err
 				}
+				color.Green("successfully uploaded file %s", p)
 				files = append(files, fileRes...)
 			}
 			return nil

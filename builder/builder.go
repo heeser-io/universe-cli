@@ -67,7 +67,7 @@ func New() *Builder {
 	}
 
 	if cache.Filemappings == nil {
-		cache.Filemappings = make(map[string][]v1.File)
+		cache.Filemappings = make(map[string][]*v1.File)
 	}
 
 	cache.Save()
@@ -462,17 +462,35 @@ func (b *Builder) buildFiles() error {
 	stack := b.stack
 
 	for _, filemapping := range stack.Filemapping {
+		cacheFiles := cache.Filemappings[filemapping.Name]
 
-		if cache.Filemappings[filemapping.Name] != nil {
+		// check if we have old files
+		fm := &Filemapping{
+			Name:  filemapping.Name,
+			Files: cacheFiles,
+			Tags:  filemapping.Tags,
+			Path:  filemapping.Path,
+		}
+		var files []*v1.File
+		var err error
 
-		} else {
-			files, err := filemapping.Upload(cache.Project.ID)
+		// if cacheFiles is nil, we need to use the filemapping of the stack
+		if cacheFiles == nil {
+			files, err = filemapping.Upload(cache.Project.ID)
 			if err != nil {
 				log.Println(err)
 				return err
 			}
-			cache.Filemappings[filemapping.Name] = files
+		} else {
+			// otherwise use created filemapping with old files
+			files, err = fm.Upload(cache.Project.ID)
+			if err != nil {
+				log.Println(err)
+				return err
+			}
 		}
+
+		cache.Filemappings[filemapping.Name] = append(cache.Filemappings[filemapping.Name], files...)
 	}
 	cache.Save()
 	return nil
