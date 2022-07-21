@@ -506,4 +506,7 @@ func BuildStack() {
 	builder.buildGateways()
 	builder.buildTasks()
 	builder.buildFiles()
+
+	// verify that functions are running
+
 }
