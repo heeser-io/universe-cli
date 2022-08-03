@@ -10,16 +10,15 @@ import (
 )
 
 type Cache struct {
-	Project      *v1.Project               `yaml:"project"`
-	Checksum     string                    `yaml:"checksum"`
-	LastUploaded string                    `yaml:"lastUploaded"`
-	Secrets      map[string]*v1.Secret     `yaml:"secrets"`
-	Collections  map[string]*v1.Collection `yaml:"collections"`
-	Functions    map[string]*v1.Function   `yaml:"functions"`
-	Gateways     map[string]*v1.Gateway    `yaml:"gateways"`
-	OAuth        *v1.OAuth                 `yaml:"oauth"`
-	Filemappings map[string][]*v1.File     `yaml:"filemappings"`
-	Tasks        map[string]*v1.Task       `yaml:"tasks"`
+	Project      *v1.Project             `yaml:"project"`
+	Checksum     string                  `yaml:"checksum"`
+	LastUploaded string                  `yaml:"lastUploaded"`
+	Secrets      map[string]*v1.Secret   `yaml:"secrets"`
+	Functions    map[string]*v1.Function `yaml:"functions"`
+	Gateways     map[string]*v1.Gateway  `yaml:"gateways"`
+	OAuth        *v1.OAuth               `yaml:"oauth"`
+	Filemappings map[string][]*v1.File   `yaml:"filemappings"`
+	Tasks        map[string]*v1.Task     `yaml:"tasks"`
 }
 
 func getCacheFile() string {

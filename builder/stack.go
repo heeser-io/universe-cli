@@ -10,14 +10,13 @@ import (
 )
 
 type Stack struct {
-	Project     v1.Project      `yaml:"project"`
-	OAuth       v1.OAuth        `yaml:"oauth"`
-	Collections []v1.Collection `yaml:"collections"`
-	Functions   []v1.Function   `yaml:"functions"`
-	Gateways    []v1.Gateway    `yaml:"gateways"`
-	Secrets     []v1.Secret     `yaml:"secrets"`
-	Filemapping []Filemapping   `yaml:"filemapping"`
-	Tasks       []v1.Task       `yaml:"tasks"`
+	Project     v1.Project    `yaml:"project"`
+	OAuth       v1.OAuth      `yaml:"oauth"`
+	Functions   []v1.Function `yaml:"functions"`
+	Gateways    []v1.Gateway  `yaml:"gateways"`
+	Secrets     []v1.Secret   `yaml:"secrets"`
+	Filemapping []Filemapping `yaml:"filemapping"`
+	Tasks       []v1.Task     `yaml:"tasks"`
 }
 
 func GetStackFile() string {

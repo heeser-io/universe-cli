@@ -44,18 +44,6 @@ func Verify() {
 		cache.Secrets[s.Name] = s
 	}
 
-	for _, collectionObj := range cache.Collections {
-		readCollectionParams := &v1.ReadCollectionParams{
-			CollectionID: collectionObj.ID,
-		}
-
-		c, err := client.Client.Collection.Read(readCollectionParams)
-		if err != nil {
-			panic(err)
-		}
-		cache.Collections[c.Name] = c
-	}
-
 	for _, functionObj := range cache.Functions {
 		readFunctionParams := &v1.ReadFunctionParams{
 			FunctionID: functionObj.ID,

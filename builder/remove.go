@@ -37,16 +37,6 @@ func RemoveStack() {
 		color.Green("successfully deleted secret %s", s.ID)
 	}
 
-	// remove collections
-	for _, c := range cache.Collections {
-		if err := client.Client.Collection.Delete(&v1.DeleteCollectionParams{
-			CollectionID: c.ID,
-		}); err != nil {
-			panic(err)
-		}
-		color.Green("successfully deleted collection %s", c.ID)
-	}
-
 	// remove functions
 	for _, f := range cache.Functions {
 		if err := client.Client.Function.Delete(&v1.DeleteFunctionParams{

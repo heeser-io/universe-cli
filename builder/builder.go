@@ -54,10 +54,6 @@ func New() *Builder {
 		cache.Functions = make(map[string]*v1.Function)
 	}
 
-	if cache.Collections == nil {
-		cache.Collections = make(map[string]*v1.Collection)
-	}
-
 	if cache.Secrets == nil {
 		cache.Secrets = make(map[string]*v1.Secret)
 	}
@@ -428,35 +424,6 @@ func (b *Builder) buildOAuth() error {
 	return nil
 }
 
-// buildCollections will try to create or update all collections in the current stack
-func (b *Builder) buildCollections() error {
-	cache := b.cache
-	stack := b.stack
-
-	projectID := b.getProjectID()
-
-	for _, collection := range stack.Collections {
-		cc := cache.Collections[collection.Name]
-
-		if cc != nil {
-
-		} else {
-			collectionObj, err := client.Client.Collection.Create(&v1.CreateCollectionParams{
-				ProjectID: projectID,
-				Name:      collection.Name,
-				IndexType: collection.IndexType,
-			})
-			if err != nil {
-				panic(err)
-			}
-			cc = collectionObj
-			cache.Collections[collection.Name] = cc
-		}
-	}
-	cache.Save()
-	return nil
-}
-
 func (b *Builder) buildFiles() error {
 	cache := b.cache
 	stack := b.stack
@@ -501,7 +468,6 @@ func BuildStack() {
 
 	builder.buildSecrets()
 	builder.buildOAuth()
-	builder.buildCollections()
 	builder.buildFunctions()
 	builder.buildGateways()
 	builder.buildTasks()
