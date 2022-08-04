@@ -26,8 +26,12 @@ type Builder struct {
 	stack *Stack
 }
 
-func New() *Builder {
-	stack := ReadStack(GetStackFile())
+func New() (*Builder, error) {
+	stack, err := ReadStack(GetStackFile())
+	if err != nil {
+		return nil, err
+	}
+
 	cache := LoadOrCreate()
 
 	if cache.Project == nil {
@@ -71,7 +75,7 @@ func New() *Builder {
 	return &Builder{
 		cache: cache,
 		stack: stack,
-	}
+	}, nil
 }
 
 // returns the projectID of the project
@@ -463,8 +467,11 @@ func (b *Builder) buildFiles() error {
 	return nil
 }
 
-func BuildStack() {
-	builder := New()
+func BuildStack() error {
+	builder, err := New()
+	if err != nil {
+		return err
+	}
 
 	builder.buildSecrets()
 	builder.buildOAuth()
@@ -473,6 +480,5 @@ func BuildStack() {
 	builder.buildTasks()
 	builder.buildFiles()
 
-	// verify that functions are running
-
+	return nil
 }

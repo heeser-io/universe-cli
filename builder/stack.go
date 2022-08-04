@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/heeser-io/universe-cli/config"
@@ -29,15 +30,15 @@ func GetStackFile() string {
 	return sf
 }
 
-func ReadStack(filepath string) *Stack {
+func ReadStack(filepath string) (*Stack, error) {
 	filedata, err := os.ReadFile(filepath)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("stack file %s not found. project initialized?", filepath)
 	}
 
 	s := &Stack{}
 	if err := yaml.Unmarshal(filedata, s); err != nil {
-		panic(err)
+		return nil, fmt.Errorf("stack file %s seems to be no valid yaml", filepath)
 	}
-	return s
+	return s, nil
 }

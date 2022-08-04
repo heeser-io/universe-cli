@@ -1,6 +1,8 @@
 package stack
 
 import (
+	"fmt"
+
 	"github.com/heeser-io/universe-cli/builder"
 	"github.com/spf13/cobra"
 )
@@ -14,7 +16,9 @@ var (
 			v := builder.HasChange()
 
 			if v || Force {
-				builder.BuildStack()
+				if err := builder.BuildStack(); err != nil {
+					fmt.Println(err)
+				}
 				builder.Verify()
 			}
 		},
