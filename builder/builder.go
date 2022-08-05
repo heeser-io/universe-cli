@@ -1,8 +1,11 @@
 package builder
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"os"
+	"path"
 	"strings"
 	"sync"
 	"time"
@@ -11,28 +14,35 @@ import (
 	"github.com/heeser-io/universe-cli/client"
 	v1 "github.com/heeser-io/universe/api/v1"
 	"github.com/heeser-io/universe/services/gateway"
+	"github.com/rs/zerolog"
 	"github.com/thoas/go-funk"
 )
-
-type Buildable interface {
-	Exists() bool
-	Create() error
-	Update() error
-	Delete() error
-}
 
 type Builder struct {
 	cache *Cache
 	stack *Stack
+	path  string
+	ctx   context.Context
 }
 
-func New() (*Builder, error) {
-	stack, err := ReadStack(GetStackFile())
+func (b *Builder) GetName() string {
+	return path.Base(b.path)
+}
+
+// New creates a new Builder for the given path.
+// If it is called on the root stack, call it with an empty string.
+func New(path string) (*Builder, error) {
+	logger := zerolog.New(os.Stdout).With().Int64("time", time.Now().Unix()).Str("path", path).Logger().Level(zerolog.ErrorLevel)
+	loggerCtx := logger.WithContext(context.Background())
+
+	stack, err := ReadStack(GetStackFile(path))
 	if err != nil {
 		return nil, err
 	}
 
-	cache := LoadOrCreate()
+	logger.Debug().Msgf("successfully got stack from %s", path)
+
+	cache := LoadOrCreate(path)
 
 	if cache.Project == nil {
 		projectObj, err := client.Client.Project.Create(&v1.CreateProjectParams{
@@ -75,6 +85,8 @@ func New() (*Builder, error) {
 	return &Builder{
 		cache: cache,
 		stack: stack,
+		path:  path,
+		ctx:   loggerCtx,
 	}, nil
 }
 
@@ -84,6 +96,10 @@ func (b *Builder) getProjectID() string {
 		panic("no project in current stack")
 	}
 	return b.cache.Project.ID
+}
+
+func (b *Builder) GetStack() *Stack {
+	return b.stack
 }
 
 // buildFunctions will try to create or update all functions in the current stack
@@ -99,7 +115,18 @@ func (b *Builder) buildFunctions() error {
 	for _, function := range stack.Functions {
 		wg.Add(1)
 		go func(function v1.Function) error {
-			checksum := Checksum(function.Path)
+			lang := NewLanguage(function.Language)
+			binaryBuilder := NewBinaryBuilder(lang, function, b.path)
+			_, err := binaryBuilder.Build()
+			if err != nil {
+				return err
+			}
+
+			checksum, err := Checksum(path.Join(b.path, function.Path))
+			if err != nil {
+				return err
+			}
+
 			// functions
 			cf := cache.Functions[function.Name]
 			environment := function.Environment
@@ -128,7 +155,7 @@ func (b *Builder) buildFunctions() error {
 				if checksum != cf.Checksum {
 					functionObj, err := UpdateFunction(&v1.UpdateFunctionParams{
 						FunctionID:  cf.ID,
-						Path:        function.Path,
+						Path:        path.Join(b.path, function.Path),
 						Checksum:    &checksum,
 						Name:        function.Name,
 						Environment: environment,
@@ -467,18 +494,12 @@ func (b *Builder) buildFiles() error {
 	return nil
 }
 
-func BuildStack() error {
-	builder, err := New()
-	if err != nil {
-		return err
-	}
-
-	builder.buildSecrets()
-	builder.buildOAuth()
-	builder.buildFunctions()
-	builder.buildGateways()
-	builder.buildTasks()
-	builder.buildFiles()
-
+func (b *Builder) BuildStack() error {
+	b.buildSecrets()
+	b.buildOAuth()
+	b.buildFunctions()
+	b.buildGateways()
+	b.buildTasks()
+	// builder.buildFiles()
 	return nil
 }

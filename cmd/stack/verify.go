@@ -10,7 +10,11 @@ var (
 		Use:   "verify",
 		Short: "verifies the current stack",
 		Run: func(cmd *cobra.Command, args []string) {
-			builder.Verify()
+			b, err := builder.New("")
+			if err != nil {
+				panic(err)
+			}
+			b.Verify()
 		},
 	}
 )

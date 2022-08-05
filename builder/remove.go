@@ -6,8 +6,8 @@ import (
 	v1 "github.com/heeser-io/universe/api/v1"
 )
 
-func RemoveStack() {
-	cache := LoadOrCreate()
+func (b *Builder) RemoveStack() {
+	cache := LoadOrCreate(b.path)
 
 	if err := client.Client.Project.Delete(&v1.DeleteProjectParams{
 		ProjectID: cache.Project.ID,

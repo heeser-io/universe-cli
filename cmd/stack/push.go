@@ -13,13 +13,35 @@ var (
 		Use:   "push",
 		Short: "pushes the current stack",
 		Run: func(cmd *cobra.Command, args []string) {
-			v := builder.HasChange()
+			b, err := builder.New("")
+			if err != nil {
+				panic(err)
+			}
+			v := b.HasChange()
+
+			stack, err := cmd.Flags().GetString("stack")
+			if err != nil {
+				panic(err)
+			}
 
 			if v || Force {
-				if err := builder.BuildStack(); err != nil {
-					fmt.Println(err)
+				if stack == "" {
+					if err := b.BuildStack(); err != nil {
+						fmt.Println(err)
+					}
+					b.Verify()
 				}
-				builder.Verify()
+
+				subBuilders := b.GetSubBuilder()
+				for _, subBuilder := range subBuilders {
+					name := subBuilder.GetName()
+					if name == stack || stack == "" {
+						if err := subBuilder.BuildStack(); err != nil {
+							fmt.Println(err)
+						}
+						subBuilder.Verify()
+					}
+				}
 			}
 		},
 	}

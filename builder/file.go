@@ -39,7 +39,10 @@ func (fm *Filemapping) Upload(projectID string) ([]*v1.File, error) {
 					return err
 				}
 
-				cs := Checksum(p)
+				cs, err := Checksum(p)
+				if err != nil {
+					return err
+				}
 
 				var eFile *v1.File
 				for _, f := range fm.Files {

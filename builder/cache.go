@@ -2,6 +2,7 @@ package builder
 
 import (
 	"os"
+	"path"
 
 	"github.com/heeser-io/universe-cli/config"
 	v1 "github.com/heeser-io/universe/api/v1"
@@ -19,19 +20,20 @@ type Cache struct {
 	OAuth        *v1.OAuth               `yaml:"oauth"`
 	Filemappings map[string][]*v1.File   `yaml:"filemappings"`
 	Tasks        map[string]*v1.Task     `yaml:"tasks"`
+	path         string
 }
 
-func getCacheFile() string {
+func getCacheFile(p string) string {
 	cf := config.Main.GetString("cacheFile")
 	if funk.IsZero(cf) {
 		cf = ".stack.yml"
 	}
 
-	return cf
+	return path.Join(p, cf)
 }
-func LoadOrCreate() *Cache {
+func LoadOrCreate(p string) *Cache {
 
-	fb, err := os.ReadFile(getCacheFile())
+	fb, err := os.ReadFile(getCacheFile(p))
 
 	create := false
 	if err != nil {
@@ -45,6 +47,7 @@ func LoadOrCreate() *Cache {
 		}
 	}
 
+	c.path = p
 	return &c
 }
 
@@ -53,7 +56,7 @@ func (c *Cache) Save() {
 	if err != nil {
 		panic(err)
 	}
-	if err := os.WriteFile(getCacheFile(), b, os.ModePerm); err != nil {
+	if err := os.WriteFile(getCacheFile(c.path), b, os.ModePerm); err != nil {
 		panic(err)
 	}
 }

@@ -10,7 +10,11 @@ var (
 		Use:   "remove",
 		Short: "removes the current stack",
 		Run: func(cmd *cobra.Command, args []string) {
-			builder.RemoveStack()
+			b, err := builder.New("")
+			if err != nil {
+				panic(err)
+			}
+			b.RemoveStack()
 		},
 	}
 )

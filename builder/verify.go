@@ -5,14 +5,17 @@ import (
 	v1 "github.com/heeser-io/universe/api/v1"
 )
 
-func HasChange() bool {
-	cache := LoadOrCreate()
+func (b *Builder) HasChange() bool {
+	cache := LoadOrCreate(b.path)
 
-	cs := Checksum(GetStackFile())
+	cs, err := Checksum(GetStackFile(b.path))
+	if err != nil {
+		panic(err)
+	}
 	return cs != cache.Checksum
 }
-func Verify() {
-	cache := LoadOrCreate()
+func (b *Builder) Verify() {
+	cache := LoadOrCreate(b.path)
 
 	p, err := client.Client.Project.Read(&v1.ReadProjectParams{
 		ProjectID: cache.Project.ID,
@@ -81,7 +84,10 @@ func Verify() {
 		cache.Tasks[t.Name] = t
 	}
 
-	cs := Checksum(GetStackFile())
+	cs, err := Checksum(GetStackFile(b.path))
+	if err != nil {
+		panic(err)
+	}
 	cache.Checksum = cs
 	cache.Save()
 
