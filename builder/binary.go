@@ -24,9 +24,9 @@ func NewBinaryBuilder(language Language, function v1.Function, path string) *Bin
 
 func (b *BinaryBuilder) Build() (bool, error) {
 
-	functionPath := path.Join(b.path, b.function.Name, "main.go")
+	functionPath := path.Join(b.path, b.function.Handler, "main.go")
 	outputFolder := path.Join(b.path, "bin")
-	outputPath := path.Join(outputFolder, b.function.Name)
+	outputPath := path.Join(outputFolder, b.function.Handler)
 
 	shell.Call(fmt.Sprintf("rm %s/*", outputFolder))
 
@@ -43,6 +43,5 @@ func (b *BinaryBuilder) Build() (bool, error) {
 	if err := MakeZip(b.path, b.function); err != nil {
 		return false, err
 	}
-
 	return true, nil
 }

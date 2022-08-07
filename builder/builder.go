@@ -80,6 +80,10 @@ func New(path string) (*Builder, error) {
 		cache.Filemappings = make(map[string][]*v1.File)
 	}
 
+	if cache.Subscriptions == nil {
+		cache.Subscriptions = make(map[string]*v1.Subscription)
+	}
+
 	cache.Save()
 
 	return &Builder{
@@ -116,13 +120,13 @@ func (b *Builder) buildFunctions() error {
 		wg.Add(1)
 		go func(function v1.Function) error {
 			lang := NewLanguage(function.Language)
-			binaryBuilder := NewBinaryBuilder(lang, function, b.path)
+			binaryBuilder := NewBinaryBuilder(lang, function, path.Join(stack.BasePath, b.path))
 			_, err := binaryBuilder.Build()
 			if err != nil {
 				return err
 			}
 
-			checksum, err := Checksum(path.Join(b.path, function.Path))
+			checksum, err := Checksum(path.Join(stack.BasePath, b.path, function.Path))
 			if err != nil {
 				return err
 			}
@@ -155,7 +159,7 @@ func (b *Builder) buildFunctions() error {
 				if checksum != cf.Checksum {
 					functionObj, err := UpdateFunction(&v1.UpdateFunctionParams{
 						FunctionID:  cf.ID,
-						Path:        path.Join(b.path, function.Path),
+						Path:        path.Join(stack.BasePath, b.path, function.Path),
 						Checksum:    &checksum,
 						Name:        function.Name,
 						Environment: environment,
@@ -455,6 +459,36 @@ func (b *Builder) buildOAuth() error {
 	return nil
 }
 
+func (b *Builder) buildSubscriptions() error {
+	cache := b.cache
+	stack := b.stack
+
+	projectID := b.getProjectID()
+
+	for _, subscription := range stack.Subscriptions {
+		cachedSubscription := cache.Subscriptions[subscription.Name]
+		if cachedSubscription != nil {
+
+		} else {
+			createSubscriptionParams := v1.CreateSubscriptionParams{
+				Name:       subscription.Name,
+				ProjectID:  projectID,
+				Resource:   subscription.Resource,
+				FunctionID: cache.Functions[subscription.FunctionID].ID,
+			}
+
+			subscriptionObj, err := client.Client.Subscription.Create(&createSubscriptionParams)
+			if err != nil {
+				panic(err)
+			}
+			color.Green("successfully created subscription %s (%s)", subscriptionObj.Name, subscriptionObj.ID)
+			cachedSubscription = subscriptionObj
+		}
+		cache.Subscriptions[subscription.Name] = cachedSubscription
+	}
+
+	return nil
+}
 func (b *Builder) buildFiles() error {
 	cache := b.cache
 	stack := b.stack
@@ -467,7 +501,7 @@ func (b *Builder) buildFiles() error {
 			Name:  filemapping.Name,
 			Files: cacheFiles,
 			Tags:  filemapping.Tags,
-			Path:  filemapping.Path,
+			Path:  path.Join(b.path, filemapping.Path),
 		}
 		var files []*v1.File
 		var err error
@@ -499,7 +533,8 @@ func (b *Builder) BuildStack() error {
 	b.buildOAuth()
 	b.buildFunctions()
 	b.buildGateways()
+	b.buildSubscriptions()
 	b.buildTasks()
-	// builder.buildFiles()
+	b.buildFiles()
 	return nil
 }

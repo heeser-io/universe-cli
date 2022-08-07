@@ -17,7 +17,7 @@ func MakeZip(p string, function v1.Function) error {
 
 	outputPath := path.Join(p, "bin")
 
-	shell.Call(fmt.Sprintf("cd %s && zip -r %s.zip %s && cd %s", outputPath, function.Name, function.Name, currentPath))
+	shell.Call(fmt.Sprintf("cd %s && zip -r %s.zip %s && cd %s", outputPath, function.Handler, function.Handler, currentPath))
 
 	return nil
 }

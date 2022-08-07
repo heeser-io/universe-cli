@@ -12,14 +12,16 @@ import (
 )
 
 type Stack struct {
-	Stacks      []ServiceStack `yaml:"stacks"`
-	Project     v1.Project     `yaml:"project"`
-	OAuth       v1.OAuth       `yaml:"oauth"`
-	Functions   []v1.Function  `yaml:"functions"`
-	Gateways    []v1.Gateway   `yaml:"gateways"`
-	Secrets     []v1.Secret    `yaml:"secrets"`
-	Filemapping []Filemapping  `yaml:"filemapping"`
-	Tasks       []v1.Task      `yaml:"tasks"`
+	BasePath      string            `yaml:"basePath"`
+	Stacks        []ServiceStack    `yaml:"stacks"`
+	Project       v1.Project        `yaml:"project"`
+	OAuth         v1.OAuth          `yaml:"oauth"`
+	Functions     []v1.Function     `yaml:"functions"`
+	Gateways      []v1.Gateway      `yaml:"gateways"`
+	Secrets       []v1.Secret       `yaml:"secrets"`
+	Filemapping   []Filemapping     `yaml:"filemapping"`
+	Tasks         []v1.Task         `yaml:"tasks"`
+	Subscriptions []v1.Subscription `yaml:"subscriptions"`
 }
 
 type ServiceStack struct {
