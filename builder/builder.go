@@ -3,6 +3,7 @@ package builder
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -409,6 +410,73 @@ func (b *Builder) buildSecrets() error {
 	return nil
 }
 
+func (b *Builder) buildTemplates() error {
+	cache := b.cache
+	stack := b.stack
+
+	projectID := b.getProjectID()
+
+	for _, t := range stack.Templates {
+		ct := cache.Templates[t.Name]
+
+		body := t.Body
+
+		splitBody := strings.Split(t.Body, "localfile:")
+
+		if len(splitBody) == 2 {
+			filepath := splitBody[1]
+
+			wd, err := os.Getwd()
+			if err != nil {
+				log.Println(err)
+				return err
+			}
+			b, err := ioutil.ReadFile(path.Join(wd, filepath))
+			if err != nil {
+				log.Println(err)
+				return err
+			}
+
+			body = string(b)
+		}
+
+		if ct != nil {
+			color.Yellow("template %s exists", t.Name)
+			updateTemplateParams := v1.UpdateTemplateParams{
+				Name: t.Name,
+				Tags: t.Tags,
+				Body: t.Body,
+			}
+
+			templateObj, err := client.Client.Template.Update(&updateTemplateParams)
+			if err != nil {
+				return err
+			}
+			color.Green("successfully updated template %s", templateObj.Name)
+		} else {
+			createTemplateParams := v1.CreateTemplateParams{
+				ProjectID: projectID,
+				Name:      t.Name,
+				Tags:      t.Tags,
+				Body:      body,
+			}
+
+			templateObj, err := client.Client.Template.Create(&createTemplateParams)
+			if err != nil {
+				return err
+			}
+
+			color.Green("successfully created template %s", templateObj.Name)
+
+			ct = templateObj
+		}
+		cache.Templates[t.Name] = ct
+		cache.Save()
+	}
+
+	return nil
+}
+
 // buildOAuth will try to create or update the oauth provider if it exists in the stack
 func (b *Builder) buildOAuth() error {
 	cache := b.cache
@@ -434,7 +502,6 @@ func (b *Builder) buildOAuth() error {
 			color.Green("successfully updated oauth %s", oauthObj.ID)
 
 			co = oauthObj
-			cache.OAuth = co
 		} else {
 			createOAuthParams := v1.CreateOAuthParams{
 				ProjectID:    projectID,
@@ -452,8 +519,8 @@ func (b *Builder) buildOAuth() error {
 			color.Green("successfully created oauth %s", oauthObj.ID)
 
 			co = oauthObj
-			cache.OAuth = co
 		}
+		cache.OAuth = co
 	}
 	cache.Save()
 	return nil
@@ -529,6 +596,7 @@ func (b *Builder) buildFiles() error {
 }
 
 func (b *Builder) BuildStack() error {
+	b.buildTemplates()
 	b.buildSecrets()
 	b.buildOAuth()
 	b.buildFunctions()

@@ -22,6 +22,7 @@ type Stack struct {
 	Filemapping   []Filemapping     `yaml:"filemapping"`
 	Tasks         []v1.Task         `yaml:"tasks"`
 	Subscriptions []v1.Subscription `yaml:"subscriptions"`
+	Templates     []v1.Template     `yaml:"templates"`
 }
 
 type ServiceStack struct {

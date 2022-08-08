@@ -21,6 +21,7 @@ type Cache struct {
 	Filemappings  map[string][]*v1.File       `yaml:"filemappings"`
 	Tasks         map[string]*v1.Task         `yaml:"tasks"`
 	Subscriptions map[string]*v1.Subscription `yaml:"subscriptions"`
+	Templates     map[string]*v1.Template     `yaml:"templates"`
 	path          string
 }
 

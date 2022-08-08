@@ -29,4 +29,6 @@ func init() {
 	rootCmd.AddCommand(ProfileCmd)
 	rootCmd.AddCommand(project.ProjectCmd)
 	rootCmd.AddCommand(function.FunctionCmd)
+
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "whether to show debug logs or not")
 }
