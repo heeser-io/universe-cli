@@ -489,9 +489,10 @@ func (b *Builder) buildTemplates() error {
 		if ct != nil {
 			color.Yellow("template %s exists", t.Name)
 			updateTemplateParams := v1.UpdateTemplateParams{
-				Name: t.Name,
-				Tags: t.Tags,
-				Body: t.Body,
+				TemplateID: ct.ID,
+				Name:       t.Name,
+				Tags:       t.Tags,
+				Body:       body,
 			}
 
 			templateObj, err := client.Client.Template.Update(&updateTemplateParams)
@@ -499,6 +500,8 @@ func (b *Builder) buildTemplates() error {
 				return err
 			}
 			color.Green("successfully updated template %s", templateObj.Name)
+
+			ct = templateObj
 		} else {
 			createTemplateParams := v1.CreateTemplateParams{
 				ProjectID: projectID,
