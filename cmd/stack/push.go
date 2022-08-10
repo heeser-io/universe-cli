@@ -2,7 +2,9 @@ package stack
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/builder"
 	"github.com/spf13/cobra"
 )
@@ -27,7 +29,8 @@ var (
 			if v || Force {
 				if stack == "" {
 					if err := b.BuildStack(); err != nil {
-						fmt.Println(err)
+						color.Red("err: %v", err)
+						os.Exit(1)
 					}
 					b.Verify()
 				}

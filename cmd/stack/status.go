@@ -27,7 +27,7 @@ var (
 
 			t.SetOutputMirror(os.Stdout)
 
-			t.AppendHeader(table.Row{"Stack", "Resource", "Name"})
+			t.AppendHeader(table.Row{"Stack", "Resource", "Name", "Id"})
 
 			if stack == "" {
 				b.PrintStatus(&t)

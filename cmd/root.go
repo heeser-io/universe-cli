@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/heeser-io/universe-cli/cmd/file"
 	"github.com/heeser-io/universe-cli/cmd/function"
 	"github.com/heeser-io/universe-cli/cmd/project"
 	"github.com/spf13/cobra"
@@ -29,6 +30,7 @@ func init() {
 	rootCmd.AddCommand(ProfileCmd)
 	rootCmd.AddCommand(project.ProjectCmd)
 	rootCmd.AddCommand(function.FunctionCmd)
+	rootCmd.AddCommand(file.FileCmd)
 
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "whether to show debug logs or not")
 }

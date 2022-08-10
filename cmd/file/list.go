@@ -1,4 +1,4 @@
-package project
+package file
 
 import (
 	"fmt"
@@ -17,9 +17,9 @@ var (
 	Limit     int64
 	ListCmd   = &cobra.Command{
 		Use:   "list",
-		Short: "list all projects for the current authenticated user",
+		Short: "list all files for the current authenticated user",
 		Run: func(cmd *cobra.Command, args []string) {
-			projects, err := client.Client.Project.List(&v1.ListProjectParams{
+			files, err := client.Client.File.List(&v1.ListFileParams{
 				Filter:    Filter,
 				Limit:     Limit,
 				Sort:      Sort,
@@ -29,7 +29,7 @@ var (
 			if err != nil {
 				color.Red("err:%v\n", err)
 			}
-			fmt.Println(string(v1.StructToByte(projects)))
+			fmt.Println(string(v1.StructToByte(files)))
 		},
 	}
 )
@@ -37,7 +37,7 @@ var (
 func init() {
 	ListCmd.Flags().StringToStringVar(&Filter, "filter", map[string]string{}, "filters")
 	ListCmd.Flags().StringVar(&After, "after", "", "after")
-	ListCmd.Flags().StringVar(&After, "sort", "", "sort")
-	ListCmd.Flags().StringVar(&After, "sort-order", "", "sort")
+	ListCmd.Flags().StringVar(&Sort, "sort", "", "sort")
+	ListCmd.Flags().StringVar(&SortOrder, "sort-order", "", "sort")
 	ListCmd.Flags().Int64Var(&Limit, "limit", 0, "limit")
 }

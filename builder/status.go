@@ -7,6 +7,10 @@ import (
 // PrintStatus can be used to print a table of all resources
 func (b *Builder) PrintStatus(t *table.Writer) {
 	for _, function := range b.cache.Functions {
-		(*t).AppendRow(table.Row{b.path, "function", function.Name})
+		(*t).AppendRow(table.Row{b.path, "function", function.Name, function.ID})
+	}
+
+	for _, gateway := range b.cache.Gateways {
+		(*t).AppendRow(table.Row{b.path, "gateway", gateway.Name, gateway.ID})
 	}
 }

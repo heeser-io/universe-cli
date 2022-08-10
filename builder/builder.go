@@ -2,6 +2,7 @@ package builder
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -140,16 +141,32 @@ func (b *Builder) buildFunctions() error {
 				environment = map[string]string{}
 			}
 
+			resources := []string{"secret", "template"}
+
 			for k, v := range environment {
-				if strings.Contains(v, "secret:") {
-					s := strings.Split(v, ":")
-					if len(s) == 2 {
-						secretObj := cache.Secrets[s[1]]
-						if secretObj != nil {
-							environment[k] = fmt.Sprintf("secret:%s", secretObj.ID)
+				contains := false
+				for _, resource := range resources {
+					if strings.Contains(v, fmt.Sprintf("%s:", resource)) {
+						s := strings.Split(v, ":")
+						if len(s) == 2 {
+							switch resource {
+							case "secret":
+								secretObj := cache.Secrets[s[1]]
+								if secretObj != nil {
+									environment[k] = fmt.Sprintf("secret:%s", secretObj.ID)
+								}
+							case "template":
+								templateObj := cache.Templates[s[1]]
+								if templateObj != nil {
+									environment[k] = templateObj.ID
+								}
+							}
 						}
+						contains = true
 					}
-				} else {
+				}
+
+				if !contains {
 					environment[k] = v
 				}
 			}
@@ -385,12 +402,42 @@ func (b *Builder) buildSecrets() error {
 	for _, s := range stack.Secrets {
 		cg := cache.Secrets[s.Name]
 
+		secretValue := s.Value
+		if strings.Contains(secretValue, "env:") {
+			envSplit := strings.Split(secretValue, "env:")
+			if len(envSplit) == 2 {
+				envKey := envSplit[1]
+				envVar := os.Getenv(envKey)
+
+				if envVar == "" {
+					return fmt.Errorf("env var %s is empty", envKey)
+				}
+				secretValue = envVar
+			} else {
+				return errors.New("should be in format env:VAR")
+			}
+		}
+
 		if cg != nil {
 			color.Yellow("secret %s exists", s.Name)
+			updateSecretParams := v1.UpdateSecretParams{
+				SecretID: cg.ID,
+				Name:     s.Name,
+				Tags:     s.Tags,
+				Value:    secretValue,
+			}
+
+			secretObj, err := client.Client.Secret.Update(&updateSecretParams)
+			if err != nil {
+				panic(err)
+			}
+
+			color.Green("successfully updated secret %s", secretObj.ID)
+			cg = secretObj
 		} else {
 			createSecretParams := v1.CreateSecretParams{
 				ProjectID: projectID,
-				Value:     s.Value,
+				Value:     secretValue,
 				Tags:      s.Tags,
 				Name:      s.Name,
 			}
@@ -401,10 +448,9 @@ func (b *Builder) buildSecrets() error {
 			}
 
 			color.Green("successfully created secret %s", secretObj.ID)
-
 			cg = secretObj
-			cache.Secrets[cg.Name] = cg
 		}
+		cache.Secrets[cg.Name] = cg
 	}
 	cache.Save()
 	return nil
@@ -535,7 +581,19 @@ func (b *Builder) buildSubscriptions() error {
 	for _, subscription := range stack.Subscriptions {
 		cachedSubscription := cache.Subscriptions[subscription.Name]
 		if cachedSubscription != nil {
+			updateSubscriptionParams := v1.UpdateSubscriptionParams{
+				SubscriptionID: cachedSubscription.ID,
+				Name:           subscription.Name,
+				Resource:       subscription.Resource,
+				FunctionID:     cache.Functions[subscription.FunctionID].ID,
+			}
 
+			subscriptionObj, err := client.Client.Subscription.Update(&updateSubscriptionParams)
+			if err != nil {
+				return err
+			}
+			color.Green("successfully updated subscription %s (%s)", subscriptionObj.Name, subscriptionObj.ID)
+			cachedSubscription = subscriptionObj
 		} else {
 			createSubscriptionParams := v1.CreateSubscriptionParams{
 				Name:       subscription.Name,
@@ -546,7 +604,7 @@ func (b *Builder) buildSubscriptions() error {
 
 			subscriptionObj, err := client.Client.Subscription.Create(&createSubscriptionParams)
 			if err != nil {
-				panic(err)
+				return err
 			}
 			color.Green("successfully created subscription %s (%s)", subscriptionObj.Name, subscriptionObj.ID)
 			cachedSubscription = subscriptionObj
@@ -596,13 +654,33 @@ func (b *Builder) buildFiles() error {
 }
 
 func (b *Builder) BuildStack() error {
-	b.buildTemplates()
-	b.buildSecrets()
-	b.buildOAuth()
-	b.buildFunctions()
-	b.buildGateways()
-	b.buildSubscriptions()
-	b.buildTasks()
-	b.buildFiles()
+	if err := b.buildTemplates(); err != nil {
+		return err
+	}
+
+	if err := b.buildSecrets(); err != nil {
+		return err
+	}
+
+	if err := b.buildOAuth(); err != nil {
+		return err
+	}
+
+	if err := b.buildFunctions(); err != nil {
+		return err
+	}
+	if err := b.buildGateways(); err != nil {
+		return err
+	}
+	if err := b.buildSubscriptions(); err != nil {
+		return err
+	}
+	if err := b.buildTasks(); err != nil {
+		return err
+	}
+	if err := b.buildFiles(); err != nil {
+		return err
+	}
+
 	return nil
 }

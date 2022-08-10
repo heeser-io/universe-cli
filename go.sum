@@ -324,6 +324,12 @@ github.com/heeser-io/universe v0.0.0-20220808103203-0efc08bf078f h1:0HEtNN89MJ8d
 github.com/heeser-io/universe v0.0.0-20220808103203-0efc08bf078f/go.mod h1:8dp1Wa3qUpM+3kBP1Yur6fzf1gu4hV8TQ6dyQHjQUm0=
 github.com/heeser-io/universe v0.0.0-20220808122427-6a39129dc6b9 h1:PDY4jdE9TY7HByewaINPLjmYUbUM2MTL6ZbgsOHwDzo=
 github.com/heeser-io/universe v0.0.0-20220808122427-6a39129dc6b9/go.mod h1:8dp1Wa3qUpM+3kBP1Yur6fzf1gu4hV8TQ6dyQHjQUm0=
+github.com/heeser-io/universe v0.0.0-20220809131730-c03db6442770 h1:GxkfaCBNrBrNIB/t1Oc697Qfy0eT2HQuy5SZcd4szLc=
+github.com/heeser-io/universe v0.0.0-20220809131730-c03db6442770/go.mod h1:8dp1Wa3qUpM+3kBP1Yur6fzf1gu4hV8TQ6dyQHjQUm0=
+github.com/heeser-io/universe v0.0.0-20220809200419-b8ea06e44a5a h1:Sv7eI2vugeqX9wZfssCTuyQeIX2hG0+gbcLHtmjimw4=
+github.com/heeser-io/universe v0.0.0-20220809200419-b8ea06e44a5a/go.mod h1:8dp1Wa3qUpM+3kBP1Yur6fzf1gu4hV8TQ6dyQHjQUm0=
+github.com/heeser-io/universe v0.0.0-20220810102003-8fb4fcfe577d h1:9zI7Un+AranySTHzLw7ZqCFEbymcUt13xddRCCCwfFE=
+github.com/heeser-io/universe v0.0.0-20220810102003-8fb4fcfe577d/go.mod h1:8dp1Wa3qUpM+3kBP1Yur6fzf1gu4hV8TQ6dyQHjQUm0=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
