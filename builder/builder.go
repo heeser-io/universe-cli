@@ -271,6 +271,7 @@ func (b *Builder) buildGateways() error {
 					Path:       r.Path,
 					Method:     r.Method,
 					AuthType:   r.AuthType,
+					Groups:     r.Groups,
 				})
 			}
 			updateGatewayParams := v1.UpdateGatewayParams{
@@ -297,6 +298,7 @@ func (b *Builder) buildGateways() error {
 					Path:       r.Path,
 					Method:     r.Method,
 					AuthType:   r.AuthType,
+					Groups:     r.Groups,
 				})
 			}
 

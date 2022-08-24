@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/fatih/color v1.13.0
-	github.com/heeser-io/universe v0.0.0-20220810102003-8fb4fcfe577d
+	github.com/heeser-io/universe v0.0.0-20220824184916-f92f1c54f199
 	github.com/joho/godotenv v1.4.0
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -26,6 +26,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/emicklei/go-restful v2.9.5+incompatible // indirect
 	github.com/go-logr/logr v1.2.0 // indirect
@@ -44,6 +45,7 @@ require (
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
 	github.com/google/gofuzz v1.1.0 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/imdario/mergo v0.3.5 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
@@ -116,4 +118,4 @@ require (
 	github.com/spf13/viper v1.11.0
 )
 
-replace github.com/heeser-io/universe v0.0.0 => /Users/yannheeser/Dev/heeser-io/universe-kubernetes
+replace github.com/heeser-io/universe v0.0.0 => ../universe-kubernetes
