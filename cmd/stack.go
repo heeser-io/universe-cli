@@ -18,6 +18,7 @@ func init() {
 	StackCmd.AddCommand(stack.RemoveCmd)
 	StackCmd.AddCommand(stack.StatusCmd)
 	StackCmd.AddCommand(stack.SkeletonCmd)
+	StackCmd.AddCommand(stack.LogCmd)
 
 	StackCmd.PersistentFlags().String("stack", "", "name of the substack")
 }

@@ -320,8 +320,15 @@ github.com/hashicorp/mdns v1.0.4/go.mod h1:mtBihi+LeNXGtG8L9dX59gAEa12BDtBQSp4v/
 github.com/hashicorp/memberlist v0.3.0/go.mod h1:MS2lj3INKhZjWNqd3N0m3J+Jxf3DAOnAH9VT3Sh9MUE=
 github.com/hashicorp/serf v0.9.6/go.mod h1:TXZNMjZQijwlDvp+r0b63xZ45H7JmCmgg4gpTwn9UV4=
 github.com/hashicorp/serf v0.9.7/go.mod h1:TXZNMjZQijwlDvp+r0b63xZ45H7JmCmgg4gpTwn9UV4=
+<<<<<<< HEAD
 github.com/heeser-io/universe v0.0.0-20220824184916-f92f1c54f199 h1:fBp0tJFTxsevF+JvglY88vZKgEK6d41ioSG6mIo63G4=
 github.com/heeser-io/universe v0.0.0-20220824184916-f92f1c54f199/go.mod h1:8dp1Wa3qUpM+3kBP1Yur6fzf1gu4hV8TQ6dyQHjQUm0=
+=======
+github.com/heeser-io/universe v0.0.0-20220811142303-349055a313b5 h1:YDN2a9udRYSkOo50oFnSLPGpybcIed2g8EteeHkZVSo=
+github.com/heeser-io/universe v0.0.0-20220811142303-349055a313b5/go.mod h1:8dp1Wa3qUpM+3kBP1Yur6fzf1gu4hV8TQ6dyQHjQUm0=
+github.com/heeser-io/universe v0.0.0-20220811154313-29c218a48805 h1:c0sDydtGTBrj7eMHU5hzRbGtD224FX9wZnzYx5YZWEI=
+github.com/heeser-io/universe v0.0.0-20220811154313-29c218a48805/go.mod h1:8dp1Wa3qUpM+3kBP1Yur6fzf1gu4hV8TQ6dyQHjQUm0=
+>>>>>>> 3dbeeefd3f9e719451a8355b2d0a3156d50e596f
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=

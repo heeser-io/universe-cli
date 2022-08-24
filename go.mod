@@ -4,12 +4,13 @@ go 1.17
 
 require (
 	github.com/fatih/color v1.13.0
-	github.com/heeser-io/universe v0.0.0-20220824184916-f92f1c54f199
+	github.com/heeser-io/universe v0.0.0-20220810102003-8fb4fcfe577d
 	github.com/joho/godotenv v1.4.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
+	github.com/gorilla/websocket v1.5.0
 	github.com/jedib0t/go-pretty/v6 v6.3.6
 	github.com/manifoldco/promptui v0.9.0
 	github.com/mitchellh/mapstructure v1.5.0
