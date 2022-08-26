@@ -209,7 +209,7 @@ func (b *Builder) buildFunctions() error {
 			} else {
 				// Create function
 				functionObj, err := CreateFunction(&v1.Function{
-					Path:        function.Path,
+					Path:        path.Join(stack.BasePath, b.path, function.Path),
 					Handler:     function.Handler,
 					Checksum:    checksum,
 					ProjectID:   projectID,

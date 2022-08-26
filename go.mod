@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/fatih/color v1.13.0
-	github.com/heeser-io/universe v0.0.0-20220810102003-8fb4fcfe577d
+	github.com/heeser-io/universe v0.0.0-20220824221219-5bc6a1a31cff
 	github.com/joho/godotenv v1.4.0
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -46,7 +46,6 @@ require (
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
 	github.com/google/gofuzz v1.1.0 // indirect
-	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/imdario/mergo v0.3.5 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
