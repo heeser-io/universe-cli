@@ -320,6 +320,8 @@ github.com/hashicorp/serf v0.9.6/go.mod h1:TXZNMjZQijwlDvp+r0b63xZ45H7JmCmgg4gpT
 github.com/hashicorp/serf v0.9.7/go.mod h1:TXZNMjZQijwlDvp+r0b63xZ45H7JmCmgg4gpTwn9UV4=
 github.com/heeser-io/universe v0.0.0-20220902120826-728b99fa14a4 h1:3Ip7Tqb0OxxVeDR8M8I4ROOAcSZECZeltheZYtqkqpw=
 github.com/heeser-io/universe v0.0.0-20220902120826-728b99fa14a4/go.mod h1:d58GX+Kv52d3oZK5kc7PhthRH+2cCaUQTmH0batLFyc=
+github.com/heeser-io/universe v0.0.0-20220915204623-f07d6d899ef0 h1:+rj8ncD+gO5/CfUyWz82q+269yplTtYp+nSJUJGXs6w=
+github.com/heeser-io/universe v0.0.0-20220915204623-f07d6d899ef0/go.mod h1:d58GX+Kv52d3oZK5kc7PhthRH+2cCaUQTmH0batLFyc=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
