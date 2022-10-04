@@ -16,14 +16,40 @@ type Language interface {
 	name() string
 }
 
+type Nodejs struct {
+	Version string
+}
+
 type Golang struct {
 	Version string
 }
 
 func NewLanguage(langstr string) Language {
+	if langstr == "nodejs14" {
+		return &Nodejs{
+			Version: "14",
+		}
+	}
 	return &Golang{
 		Version: "1.18.2",
 	}
+}
+
+func (nodejs *Nodejs) isAvailable() (bool, error) {
+	return true, nil
+}
+func (nodejs *Nodejs) version() string {
+	return nodejs.Version
+}
+func (nodejs *Nodejs) name() string {
+	return "nodejs"
+}
+func (nodejs *Nodejs) checksum(filepath string) (string, error) {
+	return "", nil
+}
+
+func (nodejs *Nodejs) build(ctx context.Context, filepath, output string) error {
+	return nil
 }
 
 func (golang *Golang) version() string {
@@ -31,7 +57,7 @@ func (golang *Golang) version() string {
 }
 
 func (golang *Golang) name() string {
-	return "golang 1.18.2"
+	return "golang"
 }
 func (golang *Golang) checksum(filepath string) (string, error) {
 	cs, err := Checksum(filepath)

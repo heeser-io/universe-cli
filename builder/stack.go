@@ -48,7 +48,7 @@ func ReadStack(filepath string) (*Stack, error) {
 
 	s := &Stack{}
 	if err := yaml.Unmarshal(filedata, s); err != nil {
-		return nil, fmt.Errorf("stack file %s seems to be no valid yaml", filepath)
+		return nil, fmt.Errorf("stack file %s seems to be no valid yaml, error: %v", filepath, err)
 	}
 	return s, nil
 }

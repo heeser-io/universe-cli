@@ -132,7 +132,6 @@ func (b *Builder) buildFunctions() error {
 			if err != nil {
 				return err
 			}
-
 			// functions
 			cf := cache.Functions[function.Name]
 			environment := function.Environment

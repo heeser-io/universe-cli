@@ -40,7 +40,7 @@ func (b *BinaryBuilder) Build() (bool, error) {
 	}
 
 	// make zip
-	if err := MakeZip(b.path, b.function); err != nil {
+	if err := MakeZip(b.language, b.path, b.function); err != nil {
 		return false, err
 	}
 	return true, nil

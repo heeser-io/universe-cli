@@ -1,7 +1,6 @@
 package builder
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/url"
@@ -40,20 +39,20 @@ func (b *Builder) Logs() {
 	go func() {
 		// receive messages
 		for {
-			msg := v1.IncomingMessage{}
-			if err := c.ReadJSON(&msg); err != nil {
-				log.Println("read: ", err)
-				os.Exit(1)
-				return
-			}
+			// msg := v1.IncomingMessage{}
+			// if err := c.ReadJSON(&msg); err != nil {
+			// 	log.Println("read: ", err)
+			// 	os.Exit(1)
+			// 	return
+			// }
 
-			log := v1.Log{}
+			// log := v1.Log{}
 
-			if err := json.Unmarshal([]byte(msg.Message), &log); err != nil {
-				fmt.Printf("err: %v\n", err)
-			}
+			// if err := json.Unmarshal([]byte(msg.Message), &log); err != nil {
+			// 	fmt.Printf("err: %v\n", err)
+			// }
 
-			fmt.Printf("%s: %s\n", log.CreatedAt, log.Value.(string))
+			// fmt.Printf("%s: %s\n", log.CreatedAt, log.Value.(string))
 		}
 	}()
 	for {
