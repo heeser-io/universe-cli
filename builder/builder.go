@@ -352,6 +352,7 @@ func (b *Builder) buildTasks() error {
 				TaskID:     ct.ID,
 				FunctionID: cache.Functions[functionID].ID,
 				Interval:   t.Interval,
+				Name:       t.Name,
 			}
 			taskObj, err := client.Client.Task.Update(&updateTaskParams)
 			if err != nil {
