@@ -15,7 +15,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
 	v1 "github.com/heeser-io/universe/api/v1"
-	"github.com/heeser-io/universe/services/gateway"
 	"github.com/rs/zerolog"
 	"github.com/thoas/go-funk"
 )
@@ -262,20 +261,9 @@ func (b *Builder) buildGateways() error {
 		if cg != nil {
 			color.Yellow("gateway %s exists", gw.Name)
 
-			routes := []gateway.Route{}
-
-			for _, r := range gw.Routes {
-				routes = append(routes, gateway.Route{
-					FunctionID: cache.Functions[r.FunctionID].ID,
-					Path:       r.Path,
-					Method:     r.Method,
-					AuthType:   r.AuthType,
-					Groups:     r.Groups,
-				})
-			}
 			updateGatewayParams := v1.UpdateGatewayParams{
 				GatewayID: cg.ID,
-				Routes:    routes,
+				Routes:    gw.Routes,
 				Tags:      gw.Tags,
 				Name:      gw.Name,
 			}
@@ -288,23 +276,10 @@ func (b *Builder) buildGateways() error {
 			color.Green("successfully updated gateway %s (%s)", gw.Name, gatewayObj.ID)
 			cg = gatewayObj
 		} else {
-			// build routes
-			routes := []gateway.Route{}
-			for _, r := range gw.Routes {
-				// r.FunctionID
-				routes = append(routes, gateway.Route{
-					FunctionID: cache.Functions[r.FunctionID].ID,
-					Path:       r.Path,
-					Method:     r.Method,
-					AuthType:   r.AuthType,
-					Groups:     r.Groups,
-				})
-			}
-
 			createGatewayParams := v1.CreateGatewayParams{
 				ProjectID: projectID,
 				Name:      gw.Name,
-				Routes:    routes,
+				Routes:    gw.Routes,
 				Tags:      gw.Tags,
 			}
 
