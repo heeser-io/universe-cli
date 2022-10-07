@@ -125,7 +125,7 @@ func (b *Builder) buildFunctions() error {
 			binaryBuilder := NewBinaryBuilder(lang, function, path.Join(stack.BasePath, b.path))
 			_, err := binaryBuilder.Build()
 			if err != nil {
-				return err
+				panic(err)
 			}
 
 			checksum, err := Checksum(path.Join(stack.BasePath, b.path, function.Path))
