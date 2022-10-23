@@ -265,6 +265,9 @@ func (b *Builder) buildGateways() error {
 			routes := []gateway.Route{}
 
 			for _, r := range gw.Routes {
+				if cache.Functions[r.FunctionID] == nil {
+					panic(fmt.Sprintf("no function with name %s found", r.FunctionID))
+				}
 				routes = append(routes, gateway.Route{
 					FunctionID:   cache.Functions[r.FunctionID].ID,
 					Path:         r.Path,
@@ -292,6 +295,9 @@ func (b *Builder) buildGateways() error {
 			// build routes
 			routes := []gateway.Route{}
 			for _, r := range gw.Routes {
+				if cache.Functions[r.FunctionID] == nil {
+					panic(fmt.Sprintf("no function with name %s found", r.FunctionID))
+				}
 				// r.FunctionID
 				routes = append(routes, gateway.Route{
 					FunctionID:   cache.Functions[r.FunctionID].ID,
