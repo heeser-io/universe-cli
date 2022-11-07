@@ -87,7 +87,7 @@ func (golang *Golang) build(ctx context.Context, filepath string, output string)
 	var cmd string
 	if golang.Version == "1.18.2" {
 		// build filepath with go 1.18.2
-		cmd = fmt.Sprintf("GOOS=linux GOARCH=amd64 go build -ldflags='-s -w' -o %s %s", output, filepath)
+		cmd = fmt.Sprintf("CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags='-s -w' -o %s %s", output, filepath)
 	}
 	logger.Debug().Msgf("compiling with command %s", cmd)
 	_, err := shell.Call(cmd)
