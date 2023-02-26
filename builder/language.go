@@ -31,7 +31,7 @@ func NewLanguage(langstr string) Language {
 		}
 	}
 	return &Golang{
-		Version: "1.18.2",
+		Version: "1.19.3",
 	}
 }
 
@@ -85,7 +85,7 @@ func (golang *Golang) build(ctx context.Context, filepath string, output string)
 	logger := zerolog.Ctx(ctx).With().Str("substep", "compile").Str("language", golang.name()).Str("version", golang.version()).Logger()
 
 	var cmd string
-	if golang.Version == "1.18.2" {
+	if golang.Version == "1.19.3" {
 		// build filepath with go 1.18.2
 		cmd = fmt.Sprintf("CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags='-s -w' -o %s %s", output, filepath)
 	}

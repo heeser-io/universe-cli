@@ -23,6 +23,8 @@ type Stack struct {
 	Tasks         []v1.Task         `yaml:"tasks"`
 	Subscriptions []v1.Subscription `yaml:"subscriptions"`
 	Templates     []v1.Template     `yaml:"templates"`
+	Webhooks      []v1.Webhook      `yaml:"webhooks"`
+	Domains       []v1.Domain       `yaml:"domains"`
 }
 
 type ServiceStack struct {

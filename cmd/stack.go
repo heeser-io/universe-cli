@@ -14,6 +14,7 @@ var (
 
 func init() {
 	StackCmd.AddCommand(stack.PushCmd)
+	StackCmd.AddCommand(stack.ServeCmd)
 	StackCmd.AddCommand(stack.VerifyCmd)
 	StackCmd.AddCommand(stack.RemoveCmd)
 	StackCmd.AddCommand(stack.StatusCmd)

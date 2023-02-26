@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path"
 	"strings"
@@ -13,11 +14,18 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/gorilla/mux"
 	"github.com/heeser-io/universe-cli/client"
+	"github.com/heeser-io/universe-cli/helper"
+	"github.com/heeser-io/universe-cli/proxy"
+	"github.com/heeser-io/universe-cli/shell"
 	v1 "github.com/heeser-io/universe/api/v1"
 	"github.com/heeser-io/universe/services/gateway"
+	"github.com/heeser-io/universe/services/serverless/invoker"
+	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog"
 	"github.com/thoas/go-funk"
+	"google.golang.org/grpc"
 )
 
 type Builder struct {
@@ -106,6 +114,164 @@ func (b *Builder) getProjectID() string {
 
 func (b *Builder) GetStack() *Stack {
 	return b.stack
+}
+
+func (b *Builder) Serve() error {
+	stack := b.stack
+
+	p := proxy.New()
+
+	fPort := 19111
+
+	fnPorts := map[string]int{}
+
+	// Serve functions
+	for _, function := range stack.Functions {
+		// RUN FUNCTION
+		if function.Language == "golang" {
+			// RUN BINARY
+			envStr := ""
+
+			for key, value := range function.Environment {
+				if strings.Contains(value, "secret:") {
+					secretValue := funk.Find(stack.Secrets, func(x v1.Secret) bool {
+						return x.Name == strings.Split(value, "secret:")[1]
+					})
+
+					secretObj, ok := secretValue.(v1.Secret)
+					if !ok {
+						panic(fmt.Errorf("secret value %s does not exist", value))
+					}
+					envStr += fmt.Sprintf("UNIVERSE_%s=%s ", key, secretObj.Value)
+				} else {
+					envStr += fmt.Sprintf("UNIVERSE_%s=%s ", key, value)
+				}
+			}
+			helper.KillPort(fmt.Sprintf("%d", fPort))
+			shell.CallAsync(fmt.Sprintf("%s RPC_PORT=%d go run %s/main.go", envStr, fPort, function.Name))
+		}
+
+		// Add to proxy
+		p.AddFunction(function.Name, "localhost", fmt.Sprintf("%d", fPort))
+
+		fnPorts[function.Name] = fPort
+		// increment port
+		fPort++
+	}
+
+	// now we serve all gateways
+	for _, gateway := range stack.Gateways {
+		router := mux.NewRouter()
+
+		router.Use(func(h http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+				h.ServeHTTP(w, r)
+			})
+		})
+
+		for _, route := range gateway.Routes {
+			route := route
+			fnPort := fnPorts[route.FunctionID]
+
+			router.Methods(route.Method).Subrouter().HandleFunc(route.Path, CreateHandlerFunc(fnPort, route))
+
+			p.Add(&gateway, route, fmt.Sprintf("localhost:%d", fPort))
+		}
+
+		go func(port int) {
+			helper.KillPort(fmt.Sprintf("%d", fPort))
+			if err := http.ListenAndServe(fmt.Sprintf("localhost:%d", port), router); err != nil {
+				panic(err)
+			}
+		}(fPort)
+	}
+
+	// serve all tasks
+	c := cron.New()
+	for _, task := range stack.Tasks {
+		c.AddFunc(task.Interval, func() {
+			fnName := strings.Split(task.FunctionID, "function:")[1]
+			fnPort := fnPorts[fnName]
+
+			conn, err := grpc.Dial(fmt.Sprintf("localhost:%d", fnPort), grpc.WithInsecure())
+			if err != nil {
+				panic(err)
+			}
+
+			rpcClient := invoker.NewInvokerClient(conn)
+
+			rpcClient.Invoke(context.Background(), &invoker.InvokeParams{
+				Auth:   &invoker.Auth{},
+				Params: &invoker.RouteParams{},
+			})
+			if err != nil {
+				panic(err)
+			}
+		})
+	}
+
+	c.Start()
+
+	return p.Listen()
+}
+
+func CreateHandlerFunc(port int, route gateway.Route) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		conn, err := grpc.Dial(fmt.Sprintf("localhost:%d", port), grpc.WithInsecure())
+		if err != nil {
+			panic(err)
+		}
+
+		rpcClient := invoker.NewInvokerClient(conn)
+
+		b, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			panic(err)
+		}
+
+		query := map[string]string{}
+
+		for k, v := range r.URL.Query() {
+			query[k] = v[0]
+		}
+
+		headers := map[string]string{}
+
+		for k, v := range r.Header {
+			headers[k] = v[0]
+		}
+
+		profileObj, err := client.Client.Profile.Read(&v1.ReadProfileParams{})
+		if err != nil {
+			panic(err)
+		}
+
+		res, err := rpcClient.Invoke(context.Background(), &invoker.InvokeParams{
+			Auth: &invoker.Auth{
+				ApiKey:  client.ApiKey,
+				Subject: profileObj.Subject,
+			},
+			Params: &invoker.RouteParams{
+				Body:    string(b),
+				Query:   query,
+				Headers: headers,
+				Params:  mux.Vars(r),
+				Method:  r.Method,
+			},
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		for k, v := range res.Headers {
+			w.Header().Set(k, v)
+		}
+		w.WriteHeader(int(res.Status))
+		if res.Body != "" {
+			w.Write([]byte(res.Body))
+		}
+	}
 }
 
 // buildFunctions will try to create or update all functions in the current stack
@@ -665,6 +831,111 @@ func (b *Builder) buildFiles() error {
 	return nil
 }
 
+func (b *Builder) buildDomains() error {
+	cache := b.cache
+	stack := b.stack
+
+	// projectID := b.getProjectID()
+
+	for _, domain := range stack.Domains {
+		cachedDomains := cache.Domains[domain.Name]
+
+		gatewayID := domain.GatewayID
+
+		if strings.Contains(gatewayID, "gateway:") {
+			gatewayName := strings.Split(gatewayID, "gateway:")[1]
+			gatewayID = cache.Gateways[gatewayName].ID
+		}
+
+		if cachedDomains != nil {
+			updateDomainParams := v1.UpdateDomainParams{
+				DomainID: cachedDomains.ID,
+				Tags:     domain.Tags,
+			}
+
+			domainObj, err := client.Client.Domain.Update(&updateDomainParams)
+			if err != nil {
+				return err
+			}
+			color.Green("successfully updated domain %s (%s)", domainObj.Name, domainObj.ID)
+			cachedDomains = domainObj
+		} else {
+			createDomainParams := v1.CreateDomainParams{
+				Name:      domain.Name,
+				GatewayID: gatewayID,
+				Tags:      domain.Tags,
+			}
+
+			domainObj, err := client.Client.Domain.Create(&createDomainParams)
+			if err != nil {
+				return err
+			}
+			color.Green("successfully created domain %s (%s)", domainObj.Name, domainObj.ID)
+			cachedDomains = domainObj
+		}
+		cache.Domains[domain.Name] = cachedDomains
+	}
+	cache.Save()
+	return nil
+}
+
+func (b *Builder) buildWebhooks() error {
+	cache := b.cache
+	stack := b.stack
+
+	projectID := b.getProjectID()
+
+	for _, webhook := range stack.Webhooks {
+		cachedWebhook := cache.Webhooks[webhook.Name]
+
+		targetUrl := webhook.TargetUrl
+
+		extractedVar := helper.ExtractVar(targetUrl)
+		if extractedVar != nil {
+			if extractedVar.Resource == "domain" {
+				targetUrl = fmt.Sprintf("%s%s", cache.Domains[extractedVar.ID].Url, extractedVar.Appendix)
+			}
+		} else {
+
+		}
+		if cachedWebhook != nil {
+			updateWebhookParams := v1.UpdateWebhookParams{
+				WebhookID: cachedWebhook.ID,
+				Name:      webhook.Name,
+				Resources: webhook.Resources,
+				Receiver:  webhook.Receiver,
+				TargetUrl: targetUrl,
+				Tags:      webhook.Tags,
+			}
+
+			webhookObj, err := client.Client.Webhook.Update(&updateWebhookParams)
+			if err != nil {
+				return err
+			}
+			color.Green("successfully updated webhook %s (%s)", webhookObj.Name, webhookObj.ID)
+			cachedWebhook = webhookObj
+		} else {
+			createWebhookParams := v1.CreateWebhookParams{
+				Name:      webhook.Name,
+				ProjectID: projectID,
+				TargetUrl: targetUrl,
+				Receiver:  webhook.Receiver,
+				Resources: webhook.Resources,
+			}
+
+			webhookObj, err := client.Client.Webhook.Create(&createWebhookParams)
+			if err != nil {
+				return err
+			}
+			color.Green("successfully created webhook %s (%s)", webhookObj.Name, webhookObj.ID)
+			cachedWebhook = webhookObj
+		}
+		cache.Webhooks[webhook.Name] = cachedWebhook
+	}
+	cache.Save()
+	return nil
+}
+
 func (b *Builder) BuildStack() error {
 	if err := b.buildTemplates(); err != nil {
 		return err
@@ -691,6 +962,14 @@ func (b *Builder) BuildStack() error {
 		return err
 	}
 	if err := b.buildFiles(); err != nil {
+		return err
+	}
+
+	if err := b.buildDomains(); err != nil {
+		return err
+	}
+
+	if err := b.buildWebhooks(); err != nil {
 		return err
 	}
 

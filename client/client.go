@@ -7,9 +7,10 @@ import (
 
 var (
 	Client *v1.Client
+	ApiKey string
 )
 
 func Init() {
-	apiKey := config.Main.GetString("apiKey")
-	Client = v1.WithAPIKey(apiKey)
+	ApiKey = config.Main.GetString("apiKey")
+	Client = v1.WithAPIKey(ApiKey)
 }

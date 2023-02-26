@@ -3,6 +3,7 @@ package shell
 import (
 	"bytes"
 	"errors"
+	"os"
 	"os/exec"
 )
 
@@ -37,6 +38,27 @@ func CallReverse(command string, args ...string) ([]byte, error) {
 	}
 
 	return outb.Bytes(), err
+}
+
+func CallAsync(command string) error {
+	go func() {
+		cmd := exec.Command("zsh", "-c", command)
+		// cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+
+		// cmd.Stdout = os.Stdout
+		// cmd.Stderr = os.Stderr
+
+		if err := cmd.Start(); err != nil {
+			return
+		}
+		err1 := cmd.Wait()
+		if err1 != nil {
+			return
+		}
+	}()
+	return nil
 }
 
 func Call(command string, args ...string) ([]byte, error) {
