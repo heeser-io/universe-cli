@@ -275,7 +275,7 @@ func CreateHandlerFunc(port int, route gateway.Route) func(w http.ResponseWriter
 }
 
 // buildFunctions will try to create or update all functions in the current stack
-func (b *Builder) buildFunctions() error {
+func (b *Builder) buildFunctions(functionName string) error {
 	cache := b.cache
 	stack := b.stack
 
@@ -285,6 +285,10 @@ func (b *Builder) buildFunctions() error {
 	wg := sync.WaitGroup{}
 
 	for _, function := range stack.Functions {
+		if function.Name != functionName && functionName != "" {
+			continue
+		}
+
 		wg.Add(1)
 		go func(function v1.Function) error {
 			lang := NewLanguage(function.Language)
@@ -347,6 +351,7 @@ func (b *Builder) buildFunctions() error {
 						Name:        function.Name,
 						Environment: environment,
 						Tags:        function.Tags,
+						DockerArgs:  function.DockerArgs,
 					})
 					if err != nil {
 						color.Red("cannot update function %s, reason: %s", function.Name, err.Error())
@@ -382,6 +387,7 @@ func (b *Builder) buildFunctions() error {
 					BaseImage:   function.BaseImage,
 					Name:        function.Name,
 					Tags:        function.Tags,
+					DockerArgs:  function.DockerArgs,
 					Language:    function.Language,
 					Environment: environment,
 				})
@@ -936,7 +942,7 @@ func (b *Builder) buildWebhooks() error {
 	return nil
 }
 
-func (b *Builder) BuildStack() error {
+func (b *Builder) BuildStack(functionName string) error {
 	if err := b.buildTemplates(); err != nil {
 		return err
 	}
@@ -949,7 +955,7 @@ func (b *Builder) BuildStack() error {
 		return err
 	}
 
-	if err := b.buildFunctions(); err != nil {
+	if err := b.buildFunctions(functionName); err != nil {
 		return err
 	}
 	if err := b.buildGateways(); err != nil {

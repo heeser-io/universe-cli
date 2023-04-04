@@ -14,6 +14,7 @@ type UpdateAndUploadFunction struct {
 	Filepath    string
 	Checksum    string
 	Tags        []string
+	DockerArgs  []string
 	Environment map[string]string
 }
 
@@ -87,6 +88,7 @@ func CreateFunction(params *v1.Function) (*v1.Function, error) {
 		Tags:        params.Tags,
 		Environment: params.Environment,
 		BaseImage:   params.BaseImage,
+		DockerArgs:  params.DockerArgs,
 	}
 
 	functionObj, err := client.Client.Function.Create(&createFunctionParams)
