@@ -54,6 +54,10 @@ func New(path string) (*Builder, error) {
 
 	cache := LoadOrCreate(path)
 
+	if stack.Project.Branch != "" {
+		client.Client.SetBranch(stack.Project.Branch)
+	}
+
 	if cache.Project == nil {
 		projectObj, err := client.Client.Project.Create(&v1.CreateProjectParams{
 			Name: stack.Project.Name,
