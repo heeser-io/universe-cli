@@ -29,6 +29,10 @@ func NewLanguage(langstr string) Language {
 		return &Nodejs{
 			Version: "14",
 		}
+	} else if langstr == "nodejs18" {
+		return &Nodejs{
+			Version: "18",
+		}
 	}
 	return &Golang{
 		Version: "1.19.3",

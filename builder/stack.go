@@ -12,19 +12,19 @@ import (
 )
 
 type Stack struct {
-	BasePath      string            `yaml:"basePath"`
-	Stacks        []ServiceStack    `yaml:"stacks"`
-	Project       v1.Project        `yaml:"project"`
-	OAuth         v1.OAuth          `yaml:"oauth"`
-	Functions     []v1.Function     `yaml:"functions"`
-	Gateways      []v1.Gateway      `yaml:"gateways"`
-	Secrets       []v1.Secret       `yaml:"secrets"`
-	Filemapping   []Filemapping     `yaml:"filemapping"`
-	Tasks         []v1.Task         `yaml:"tasks"`
-	Subscriptions []v1.Subscription `yaml:"subscriptions"`
-	Templates     []v1.Template     `yaml:"templates"`
-	Webhooks      []v1.Webhook      `yaml:"webhooks"`
-	Domains       []v1.Domain       `yaml:"domains"`
+	BasePath      string                `yaml:"basePath"`
+	Stacks        []ServiceStack        `yaml:"stacks"`
+	Project       v1.Project            `yaml:"project"`
+	OAuth         v1.OAuth              `yaml:"oauth"`
+	Functions     []v1.Function         `yaml:"functions"`
+	Gateways      []v1.Gateway          `yaml:"gateways"`
+	Secrets       []v1.Secret           `yaml:"secrets"`
+	Filemapping   []Filemapping         `yaml:"filemapping"`
+	Tasks         []v1.CreateTaskParams `yaml:"tasks"`
+	Subscriptions []v1.Subscription     `yaml:"subscriptions"`
+	Templates     []v1.Template         `yaml:"templates"`
+	Webhooks      []v1.Webhook          `yaml:"webhooks"`
+	Domains       []v1.Domain           `yaml:"domains"`
 }
 
 type ServiceStack struct {

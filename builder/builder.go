@@ -314,7 +314,7 @@ func (b *Builder) buildFunctions(functionName string) error {
 				environment = map[string]string{}
 			}
 
-			resources := []string{"secret", "template"}
+			resources := []string{"secret", "template", "env"}
 
 			for k, v := range environment {
 				contains := false
@@ -333,6 +333,12 @@ func (b *Builder) buildFunctions(functionName string) error {
 								if templateObj != nil {
 									environment[k] = templateObj.ID
 								}
+							case "env":
+								value := os.Getenv(s[1])
+								if value == "" {
+									panic(fmt.Sprintf("env var %s no value", s[1]))
+								}
+								environment[k] = value
 							}
 						}
 						contains = true
@@ -561,6 +567,9 @@ func (b *Builder) buildTasks() error {
 				Tags:       t.Tags,
 				FunctionID: cache.Functions[functionID].ID,
 				Interval:   t.Interval,
+				Reference:  t.Reference,
+				Delay:      t.Delay,
+				RunAt:      t.RunAt,
 				ProjectID:  projectID,
 			}
 			taskObj, err := client.Client.Task.Create(&createTaskParams)
