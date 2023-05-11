@@ -1,5 +1,5 @@
 source = ["./bin/macos/universe"]
-bundle_id = "io.heeser.meta-cli"
+bundle_id = "io.universecloud.cli"
 
 apple_id {
   username = "yann@heeser.io"
@@ -8,7 +8,7 @@ apple_id {
 }
 
 sign {
-  application_identity = "C9C0D18A16BEE8034D9601F247DFD2A5D24926DB"
+  application_identity = "9ED3857AFEC2BAAEED941122856E838450887B4B"
 }
 
 zip {
