@@ -2,7 +2,6 @@ package builder
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path"
 
@@ -27,7 +26,6 @@ func MakeZip(lang Language, p string, function v1.Function) error {
 	if lang.name() == "nodejs" {
 		// we dont need to go to outputPath, because there is no compiled executable
 		cmd := fmt.Sprintf("sh -c 'cd %s && zip -r %s.zip %s %s && cd %s'", path.Join(p, function.Name), path.Join("..", "bin", function.Name), "src", "package.json", currentPath)
-		log.Println(cmd)
 		_, err := shell.Call(cmd)
 		if err != nil {
 			return err

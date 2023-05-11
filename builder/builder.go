@@ -593,6 +593,26 @@ func (b *Builder) buildSecrets() error {
 
 	projectID := b.getProjectID()
 
+	for _, s := range cache.Secrets {
+		// look for deleted ones
+		deleteSecret := funk.Find(stack.Secrets, func(secret v1.Secret) bool {
+			return secret.Name == s.Name
+		}) == nil
+
+		if deleteSecret {
+			deleteSecretParams := v1.DeleteSecretParams{
+				SecretID: s.ID,
+			}
+
+			if err := client.Client.Secret.Delete(&deleteSecretParams); err != nil {
+				panic(err)
+			}
+			color.Red("secret %s (%s) deleted", s.Name, s.ID)
+		}
+
+		delete(cache.Secrets, s.Name)
+	}
+
 	for _, s := range stack.Secrets {
 		cg := cache.Secrets[s.Name]
 
