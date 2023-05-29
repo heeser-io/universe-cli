@@ -3,7 +3,7 @@ package builder
 func (b *Builder) GetSubBuilder() []*Builder {
 	builderArr := []*Builder{}
 	for _, substack := range b.stack.Stacks {
-		subBuilder, err := New(substack.BasePath)
+		subBuilder, err := New(substack.BasePath, false)
 		if err != nil {
 			panic(err)
 		}

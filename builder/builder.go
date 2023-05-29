@@ -41,7 +41,7 @@ func (b *Builder) GetName() string {
 
 // New creates a new Builder for the given path.
 // If it is called on the root stack, call it with an empty string.
-func New(path string) (*Builder, error) {
+func New(path string, download bool) (*Builder, error) {
 	logger := zerolog.New(os.Stdout).With().Int64("time", time.Now().Unix()).Str("path", path).Logger().Level(zerolog.ErrorLevel)
 	loggerCtx := logger.WithContext(context.Background())
 
@@ -58,7 +58,7 @@ func New(path string) (*Builder, error) {
 		client.Client.SetBranch(stack.Project.Branch)
 	}
 
-	if cache.Project == nil {
+	if cache.Project == nil && !download {
 		projectObj, err := client.Client.Project.Create(&v1.CreateProjectParams{
 			Name: stack.Project.Name,
 			Tags: stack.Project.Tags,
@@ -278,12 +278,101 @@ func CreateHandlerFunc(port int, route gateway.Route) func(w http.ResponseWriter
 	}
 }
 
+// buildKeyValues will try to create or update all keyvalues in the current stack
+func (b *Builder) buildKeyValues() error {
+	cache := b.cache
+	stack := b.stack
+	projectID := b.getProjectID()
+
+	for _, kv := range cache.KeyValues {
+		// look for deleted ones
+		deleteKeyValue := funk.Find(stack.KeyValues, func(keyvalue v1.KeyValue) bool {
+			return keyvalue.Namespace == kv.Namespace && keyvalue.Key == kv.Key
+		}) == nil
+
+		if deleteKeyValue {
+			deleteKeyvalueParams := v1.DeleteKeyValueParams{
+				Namespace: kv.Namespace,
+				Key:       kv.Key,
+			}
+
+			if err := client.Client.KeyValue.Delete(&deleteKeyvalueParams); err != nil {
+				panic(err)
+			}
+			color.Red("keyvalue %s.%s (%s) deleted", kv.Namespace, kv.Key, kv.ID)
+			delete(cache.KeyValues, fmt.Sprintf("%s.%s", kv.Namespace, kv.Key))
+		}
+	}
+
+	for _, kv := range stack.KeyValues {
+		key := fmt.Sprintf("%s.%s", kv.Namespace, kv.Key)
+		ckv := cache.KeyValues[key]
+
+		if ckv != nil {
+			color.Yellow("keyvalue %s.%s exists", kv.Namespace, kv.Key)
+			updateKeyvalueParams := v1.UpdateKeyValueParams{
+				Key:       kv.Key,
+				Namespace: kv.Namespace,
+				Value:     kv.Value,
+			}
+
+			keyvalueObj, err := client.Client.KeyValue.Update(&updateKeyvalueParams)
+			if err != nil {
+				panic(err)
+			}
+
+			color.Green("successfully updated keyvalue %s.%s (%s)", kv.Namespace, kv.Key, keyvalueObj.ID)
+			ckv = keyvalueObj
+		} else {
+			createKeyValue := v1.CreateKeyValueParams{
+				ProjectID: projectID,
+				Namespace: kv.Namespace,
+				Key:       kv.Key,
+				Value:     kv.Value,
+				Tags:      kv.Tags,
+			}
+
+			keyvalueObj, err := client.Client.KeyValue.Create(&createKeyValue)
+			if err != nil {
+				panic(err)
+			}
+
+			color.Green("successfully created keyvalue %s.%s (%s)", kv.Namespace, kv.Key, keyvalueObj.ID)
+
+			ckv = keyvalueObj
+		}
+		cache.KeyValues[key] = ckv
+	}
+
+	cache.Save()
+	return nil
+}
+
 // buildFunctions will try to create or update all functions in the current stack
 func (b *Builder) buildFunctions(functionName string) error {
 	cache := b.cache
 	stack := b.stack
 
 	projectID := b.getProjectID()
+
+	for _, s := range cache.Functions {
+		// look for deleted ones
+		deleteFunction := funk.Find(stack.Functions, func(function v1.Function) bool {
+			return function.Name == s.Name
+		}) == nil
+
+		if deleteFunction {
+			deleteFunctionParams := v1.DeleteFunctionParams{
+				FunctionID: s.ID,
+			}
+
+			if err := client.Client.Function.Delete(&deleteFunctionParams); err != nil {
+				panic(err)
+			}
+			color.Red("function %s (%s) deleted", s.Name, s.ID)
+			delete(cache.Functions, s.Name)
+		}
+	}
 
 	// push functions in parallel
 	wg := sync.WaitGroup{}
@@ -362,6 +451,7 @@ func (b *Builder) buildFunctions(functionName string) error {
 						Environment: environment,
 						Tags:        function.Tags,
 						DockerArgs:  function.DockerArgs,
+						Cache:       function.Cache,
 					})
 					if err != nil {
 						color.Red("cannot update function %s, reason: %s", function.Name, err.Error())
@@ -400,6 +490,7 @@ func (b *Builder) buildFunctions(functionName string) error {
 					DockerArgs:  function.DockerArgs,
 					Language:    function.Language,
 					Environment: environment,
+					Cache:       function.Cache,
 				})
 				if err != nil {
 					color.Red("cannot create function %s, reason: %s", function.Name, err.Error())
@@ -457,6 +548,7 @@ func (b *Builder) buildGateways() error {
 					AuthType:     r.AuthType,
 					Groups:       r.Groups,
 					ApiKeyHeader: r.ApiKeyHeader,
+					Cache:        r.Cache,
 				})
 			}
 			updateGatewayParams := v1.UpdateGatewayParams{
@@ -488,6 +580,7 @@ func (b *Builder) buildGateways() error {
 					AuthType:     r.AuthType,
 					Groups:       r.Groups,
 					ApiKeyHeader: r.ApiKeyHeader,
+					Cache:        r.Cache,
 				})
 			}
 			createGatewayParams := v1.CreateGatewayParams{
@@ -608,9 +701,8 @@ func (b *Builder) buildSecrets() error {
 				panic(err)
 			}
 			color.Red("secret %s (%s) deleted", s.Name, s.ID)
+			delete(cache.Secrets, s.Name)
 		}
-
-		delete(cache.Secrets, s.Name)
 	}
 
 	for _, s := range stack.Secrets {

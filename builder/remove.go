@@ -14,7 +14,7 @@ func (b *Builder) RemoveStack() {
 	}); err != nil {
 		color.Red("no project with %s ", cache.Project.ID)
 	} else {
-		color.Green("successfully deleted project %s", cache.Project.ID)
+		color.Green("successfully deleted project %s (%s)", cache.Project.Name, cache.Project.ID)
 	}
 
 	if cache.OAuth != nil {
@@ -24,7 +24,7 @@ func (b *Builder) RemoveStack() {
 		}); err != nil {
 			panic(err)
 		}
-		color.Green("successfully deleted oauth %s", cache.Project.ID)
+		color.Green("successfully deleted oauth %s (%s)", cache.OAuth.App.ClientName, cache.OAuth.ID)
 	}
 
 	// remove secrets
@@ -34,7 +34,7 @@ func (b *Builder) RemoveStack() {
 		}); err != nil {
 			panic(err)
 		}
-		color.Green("successfully deleted secret %s", s.ID)
+		color.Green("successfully deleted secret %s (%s)", s.ID, s.Name)
 	}
 
 	// remove functions
@@ -44,7 +44,7 @@ func (b *Builder) RemoveStack() {
 		}); err != nil {
 			panic(err)
 		}
-		color.Green("successfully deleted function %s", f.ID)
+		color.Green("successfully deleted function %s (%s)", f.ID, f.Name)
 	}
 
 	// remove gateways
@@ -54,7 +54,7 @@ func (b *Builder) RemoveStack() {
 		}); err != nil {
 			panic(err)
 		}
-		color.Green("successfully deleted gateway %s", g.ID)
+		color.Green("successfully deleted gateway %s (%s)", g.ID, g.Name)
 	}
 
 	for _, t := range cache.Tasks {
@@ -63,7 +63,35 @@ func (b *Builder) RemoveStack() {
 		}); err != nil {
 			panic(err)
 		}
-		color.Green("successfully deleted task %s", t.ID)
+		color.Green("successfully deleted task %s (%s)", t.ID, t.Name)
+	}
+
+	for _, w := range cache.Webhooks {
+		if err := client.Client.Webhook.Delete(&v1.DeleteWebhookParams{
+			WebhookID: w.ID,
+		}); err != nil {
+			panic(err)
+		}
+		color.Green("successfully deleted webhook %s (%s)", w.ID, w.Name)
+	}
+
+	for _, d := range cache.Domains {
+		if err := client.Client.Domain.Delete(&v1.DeleteDomainParams{
+			DomainID: d.ID,
+		}); err != nil {
+			panic(err)
+		}
+		color.Green("successfully deleted domain %s (%s)", d.ID, d.Name)
+	}
+
+	for _, kv := range cache.KeyValues {
+		if err := client.Client.KeyValue.Delete(&v1.DeleteKeyValueParams{
+			Namespace: kv.Namespace,
+			Key:       kv.Key,
+		}); err != nil {
+			panic(err)
+		}
+		color.Green("successfully deleted keyvalue %s.%s (%s)", kv.Namespace, kv.Key, kv.ID)
 	}
 
 	// make a backup of .stack.yml for later recovery

@@ -25,6 +25,7 @@ type Stack struct {
 	Templates     []v1.Template         `yaml:"templates"`
 	Webhooks      []v1.Webhook          `yaml:"webhooks"`
 	Domains       []v1.Domain           `yaml:"domains"`
+	KeyValues     []v1.KeyValue         `yaml:"keyvalues"`
 }
 
 type ServiceStack struct {

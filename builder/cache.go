@@ -24,6 +24,7 @@ type Cache struct {
 	Templates     map[string]*v1.Template     `yaml:"templates"`
 	Webhooks      map[string]*v1.Webhook      `yaml:"webhooks"`
 	Domains       map[string]*v1.Domain       `yaml:"domains"`
+	KeyValues     map[string]*v1.KeyValue     `yaml:"keyvalues"`
 	path          string
 }
 

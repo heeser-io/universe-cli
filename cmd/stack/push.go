@@ -29,7 +29,7 @@ var (
 				}
 			}
 
-			b, err := builder.New("")
+			b, err := builder.New("", false)
 			if err != nil {
 				panic(err)
 			}

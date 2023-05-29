@@ -10,7 +10,7 @@ var (
 		Use:   "log",
 		Short: "get live logs of stack",
 		Run: func(cmd *cobra.Command, args []string) {
-			b, err := builder.New("")
+			b, err := builder.New("", false)
 			if err != nil {
 				panic(err)
 			}

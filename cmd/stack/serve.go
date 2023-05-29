@@ -10,7 +10,7 @@ var (
 		Use:   "serve",
 		Short: "serves all functions for local testing",
 		Run: func(cmd *cobra.Command, args []string) {
-			b, err := builder.New("")
+			b, err := builder.New("", false)
 			if err != nil {
 				panic(err)
 			}
