@@ -1,4 +1,4 @@
-package file
+package log
 
 import (
 	"fmt"
@@ -20,9 +20,9 @@ var (
 	Limit       int64
 	ListCmd     = &cobra.Command{
 		Use:   "list",
-		Short: "list all files for the current authenticated user",
+		Short: "list all logs for the current authenticated user",
 		Run: func(cmd *cobra.Command, args []string) {
-			files, err := client.Client.File.List(&v1.ListFileParams{
+			logs, err := client.Client.Log.List(&v1.ListLogParams{
 				Filter:      Filter,
 				Limit:       Limit,
 				Sort:        Sort,
@@ -35,7 +35,7 @@ var (
 			if err != nil {
 				color.Red("err:%v\n", err)
 			}
-			fmt.Println(string(v1.StructToByte(files)))
+			fmt.Println(string(v1.StructToByte(logs)))
 		},
 	}
 )

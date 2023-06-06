@@ -10,7 +10,6 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/heeser-io/universe-cli/config"
-	v1 "github.com/heeser-io/universe/api/v1"
 )
 
 func (b *Builder) Logs() {
@@ -18,7 +17,7 @@ func (b *Builder) Logs() {
 
 	u := url.URL{
 		Scheme:   "wss",
-		Host:     v1.WEBSOCKET_URL,
+		Host:     "https://api.universecloud.dev/websocket",
 		Path:     "/websocket",
 		RawQuery: fmt.Sprintf("devkey=%s&subscribeTo=*.*.log.create.function:62ef7a882ec831eecae22100", apiKey),
 	}
