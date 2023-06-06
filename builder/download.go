@@ -42,7 +42,8 @@ func (b *Builder) Download(project *v1.Project) error {
 		return err
 	}
 	for _, functionObj := range functions {
-		c.Functions[functionObj.Name] = &functionObj
+		functionObjCopy := functionObj
+		c.Functions[functionObj.Name] = &functionObjCopy
 	}
 	// c.Save()
 
@@ -53,7 +54,8 @@ func (b *Builder) Download(project *v1.Project) error {
 		return err
 	}
 	for _, secretObj := range secrets {
-		c.Secrets[secretObj.Name] = &secretObj
+		secretObjCopy := secretObj
+		c.Secrets[secretObj.Name] = &secretObjCopy
 	}
 
 	gateways, err := client.Client.Gateway.List(&v1.ListGatewayParams{
@@ -63,7 +65,8 @@ func (b *Builder) Download(project *v1.Project) error {
 		return err
 	}
 	for _, gatewayObj := range gateways {
-		c.Gateways[gatewayObj.Name] = &gatewayObj
+		gatewayObjCopy := gatewayObj
+		c.Gateways[gatewayObj.Name] = &gatewayObjCopy
 	}
 
 	subscriptions, err := client.Client.Subscription.List(&v1.ListSubscriptionParams{
@@ -73,7 +76,8 @@ func (b *Builder) Download(project *v1.Project) error {
 		return err
 	}
 	for _, subscriptionObj := range subscriptions {
-		c.Subscriptions[subscriptionObj.Name] = &subscriptionObj
+		subscriptionObjCopy := subscriptionObj
+		c.Subscriptions[subscriptionObj.Name] = &subscriptionObjCopy
 	}
 
 	templates, err := client.Client.Template.List(&v1.ListTemplateParams{
@@ -83,7 +87,8 @@ func (b *Builder) Download(project *v1.Project) error {
 		return err
 	}
 	for _, templateObj := range templates {
-		c.Templates[templateObj.Name] = &templateObj
+		templateObjCopy := templateObj
+		c.Templates[templateObj.Name] = &templateObjCopy
 	}
 
 	webhooks, err := client.Client.Webhook.List(&v1.ListWebhookParams{
@@ -93,7 +98,8 @@ func (b *Builder) Download(project *v1.Project) error {
 		return err
 	}
 	for _, webhookObj := range webhooks {
-		c.Webhooks[webhookObj.Name] = &webhookObj
+		webhookObjCopy := webhookObj
+		c.Webhooks[webhookObj.Name] = &webhookObjCopy
 	}
 
 	tasks, err := client.Client.Task.List(&v1.ListTaskParams{
@@ -103,7 +109,8 @@ func (b *Builder) Download(project *v1.Project) error {
 		return err
 	}
 	for _, taskObj := range tasks {
-		c.Tasks[taskObj.Name] = &taskObj
+		taskObjCopy := taskObj
+		c.Tasks[taskObj.Name] = &taskObjCopy
 	}
 
 	domains, err := client.Client.Domain.List(&v1.ListDomainParams{
@@ -113,7 +120,8 @@ func (b *Builder) Download(project *v1.Project) error {
 		return err
 	}
 	for _, domainObj := range domains {
-		c.Domains[domainObj.Name] = &domainObj
+		domainObjCopy := domainObj
+		c.Domains[domainObj.Name] = &domainObjCopy
 	}
 
 	oauth, err := client.Client.OAuth.List(&v1.ListOAuthParams{
@@ -133,7 +141,8 @@ func (b *Builder) Download(project *v1.Project) error {
 		return err
 	}
 	for _, keyvalue := range keyvalues {
-		c.KeyValues[fmt.Sprintf("%s.%s", keyvalue.Namespace, keyvalue.Key)] = &keyvalue
+		keyvalueCopy := keyvalue
+		c.KeyValues[fmt.Sprintf("%s.%s", keyvalue.Namespace, keyvalue.Key)] = &keyvalueCopy
 	}
 
 	c.Save()
