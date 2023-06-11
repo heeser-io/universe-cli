@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/heeser-io/universe-cli/cmd/data"
 	"github.com/heeser-io/universe-cli/cmd/file"
 	"github.com/heeser-io/universe-cli/cmd/function"
 	"github.com/heeser-io/universe-cli/cmd/log"
@@ -29,10 +30,13 @@ func Execute() {
 func init() {
 	rootCmd.AddCommand(StackCmd)
 	rootCmd.AddCommand(ProfileCmd)
-	rootCmd.AddCommand(project.ProjectCmd)
-	rootCmd.AddCommand(function.FunctionCmd)
+	rootCmd.AddCommand(data.DataCmd)
 	rootCmd.AddCommand(file.FileCmd)
+	rootCmd.AddCommand(function.FunctionCmd)
 	rootCmd.AddCommand(log.LogCmd)
+	rootCmd.AddCommand(project.ProjectCmd)
+	rootCmd.AddCommand(data.DataCmd)
 
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "whether to show debug logs or not")
+	rootCmd.PersistentFlags().String("branch", "v", "set a branch")
 }

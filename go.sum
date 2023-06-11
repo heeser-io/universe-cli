@@ -287,6 +287,8 @@ github.com/heeser-io/universe v0.0.0-20230606230953-4fdd952e2fbc h1:zTT7wwTMI0Y1
 github.com/heeser-io/universe v0.0.0-20230606230953-4fdd952e2fbc/go.mod h1:zvRYkM/N9uEz2vem+ZRQMm4lT6dqHgmvbfj7AELgqoM=
 github.com/heeser-io/universe v0.0.0-20230606233414-5f69b40fe057 h1:gVpwIr1B91JL07GQGo62CaPImpwPl7+YMJBy7y1K4dc=
 github.com/heeser-io/universe v0.0.0-20230606233414-5f69b40fe057/go.mod h1:zvRYkM/N9uEz2vem+ZRQMm4lT6dqHgmvbfj7AELgqoM=
+github.com/heeser-io/universe v0.0.0-20230611202524-f59eba1891c5 h1:05E0sF3kagLiuM7QsYZws0RzPQ5TLn3TcajWmDNBHzQ=
+github.com/heeser-io/universe v0.0.0-20230611202524-f59eba1891c5/go.mod h1:zvRYkM/N9uEz2vem+ZRQMm4lT6dqHgmvbfj7AELgqoM=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
