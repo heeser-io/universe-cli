@@ -17,6 +17,7 @@ var (
 )
 
 func init() {
+	DataCmd.Flags().StringToStringVar(&Filter, "filter", map[string]string{}, "filters")
 	DataCmd.PersistentFlags().StringVarP(&CollectionName, "collection-name", "c", "", "name of the collection (required)")
 	DataCmd.PersistentFlags().StringVar(&IndexName, "index-name", "_id", "name of the index")
 	DataCmd.PersistentFlags().StringVar(&IndexValue, "index-value", "", "value of the index")

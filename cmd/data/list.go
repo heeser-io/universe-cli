@@ -42,7 +42,6 @@ var (
 )
 
 func init() {
-	ListCmd.Flags().StringToStringVar(&Filter, "filter", map[string]string{}, "filters")
 	ListCmd.Flags().StringVar(&After, "after", "", "after")
 	ListCmd.Flags().StringVar(&AfterField, "afterField", "", "afterField")
 	ListCmd.Flags().StringVar(&Before, "before", "", "before")
