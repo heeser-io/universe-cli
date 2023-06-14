@@ -1,4 +1,6 @@
-FROM golang:1.18.3-alpine3.16
+FROM alpine:3.18
+
+LABEL org.opencontainers.image.source https://github.com/heeser-io/universe-cli
 
 RUN apk add --no-cache ca-certificates git zip
 

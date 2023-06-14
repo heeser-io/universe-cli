@@ -10,10 +10,12 @@ import (
 	"github.com/heeser-io/universe-cli/cmd/log"
 	"github.com/heeser-io/universe-cli/cmd/notification"
 	"github.com/heeser-io/universe-cli/cmd/project"
+	"github.com/heeser-io/universe-cli/cmd/team"
 	"github.com/spf13/cobra"
 )
 
 var (
+	TeamID  string
 	rootCmd = &cobra.Command{
 		Use:           "universe",
 		Short:         "CLI for universe",
@@ -31,6 +33,7 @@ func Execute() {
 func init() {
 	rootCmd.AddCommand(StackCmd)
 	rootCmd.AddCommand(ProfileCmd)
+	rootCmd.AddCommand(team.TeamCmd)
 	rootCmd.AddCommand(file.FileCmd)
 	rootCmd.AddCommand(function.FunctionCmd)
 	rootCmd.AddCommand(log.LogCmd)
