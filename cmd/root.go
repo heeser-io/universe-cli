@@ -10,6 +10,7 @@ import (
 	"github.com/heeser-io/universe-cli/cmd/log"
 	"github.com/heeser-io/universe-cli/cmd/notification"
 	"github.com/heeser-io/universe-cli/cmd/project"
+	"github.com/heeser-io/universe-cli/cmd/redirect"
 	"github.com/heeser-io/universe-cli/cmd/team"
 	"github.com/spf13/cobra"
 )
@@ -40,6 +41,7 @@ func init() {
 	rootCmd.AddCommand(project.ProjectCmd)
 	rootCmd.AddCommand(data.DataCmd)
 	rootCmd.AddCommand(notification.NotificationCmd)
+	rootCmd.AddCommand(redirect.RedirectCmd)
 
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "whether to show debug logs or not")
 	rootCmd.PersistentFlags().String("branch", "v", "set a branch")
