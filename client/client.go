@@ -12,5 +12,12 @@ var (
 
 func Init() {
 	ApiKey = config.Main.GetString("apiKey")
-	Client = v1.WithAPIKey(ApiKey)
+
+	token := config.Main.GetString("token")
+
+	if token != "" {
+		Client = v1.WithToken(token)
+	} else {
+		Client = v1.WithAPIKey(ApiKey)
+	}
 }

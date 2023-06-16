@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/heeser-io/universe-cli/cmd/auth"
 	"github.com/heeser-io/universe-cli/cmd/data"
 	"github.com/heeser-io/universe-cli/cmd/file"
 	"github.com/heeser-io/universe-cli/cmd/function"
 	"github.com/heeser-io/universe-cli/cmd/log"
 	"github.com/heeser-io/universe-cli/cmd/notification"
 	"github.com/heeser-io/universe-cli/cmd/project"
+	"github.com/heeser-io/universe-cli/cmd/quota"
 	"github.com/heeser-io/universe-cli/cmd/redirect"
 	"github.com/heeser-io/universe-cli/cmd/team"
 	"github.com/spf13/cobra"
@@ -42,6 +44,8 @@ func init() {
 	rootCmd.AddCommand(data.DataCmd)
 	rootCmd.AddCommand(notification.NotificationCmd)
 	rootCmd.AddCommand(redirect.RedirectCmd)
+	rootCmd.AddCommand(auth.AuthCmd)
+	rootCmd.AddCommand(quota.QuotaCmd)
 
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "whether to show debug logs or not")
 	rootCmd.PersistentFlags().String("branch", "v", "set a branch")
