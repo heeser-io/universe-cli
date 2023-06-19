@@ -41,12 +41,12 @@ var (
 )
 
 func init() {
-	ListCmd.Flags().StringToStringVar(&Filter, "filter", map[string]string{}, "filters")
-	ListCmd.Flags().StringVar(&After, "after", "", "after")
-	ListCmd.Flags().StringVar(&AfterField, "afterField", "", "afterField")
-	ListCmd.Flags().StringVar(&Before, "before", "", "before")
-	ListCmd.Flags().StringVar(&BeforeField, "beforeField", "", "beforeField")
-	ListCmd.Flags().StringVar(&Sort, "sort", "", "sort")
-	ListCmd.Flags().StringVar(&SortOrder, "sort-order", "", "sort")
-	ListCmd.Flags().Int64Var(&Limit, "limit", 0, "limit")
+	ListCmd.Flags().StringToStringVar(&Filter, "filter", map[string]string{}, `you can filter for a specific function --filter "resource=function:xyz"`)
+	ListCmd.Flags().StringVar(&After, "after", "", "define a value after which entries should be shown")
+	ListCmd.Flags().StringVar(&AfterField, "afterField", "", "for example createdAt (default is _id)")
+	ListCmd.Flags().StringVar(&Before, "before", "", "define a value before which entries should be shown")
+	ListCmd.Flags().StringVar(&BeforeField, "beforeField", "", "for example createdAt (default is _id)")
+	ListCmd.Flags().StringVar(&Sort, "sort", "", "for example createdAt")
+	ListCmd.Flags().StringVar(&SortOrder, "sort-order", "", "DESC or ASC (default is asc)")
+	ListCmd.Flags().Int64Var(&Limit, "limit", 0, "limit (server default is 50, max 500)")
 }

@@ -14,6 +14,7 @@ import (
 	"github.com/heeser-io/universe-cli/cmd/quota"
 	"github.com/heeser-io/universe-cli/cmd/redirect"
 	"github.com/heeser-io/universe-cli/cmd/team"
+	"github.com/heeser-io/universe-cli/cmd/websocket"
 	"github.com/spf13/cobra"
 )
 
@@ -46,6 +47,7 @@ func init() {
 	rootCmd.AddCommand(redirect.RedirectCmd)
 	rootCmd.AddCommand(auth.AuthCmd)
 	rootCmd.AddCommand(quota.QuotaCmd)
+	rootCmd.AddCommand(websocket.WebsocketCmd)
 
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "whether to show debug logs or not")
 	rootCmd.PersistentFlags().String("branch", "v", "set a branch")
