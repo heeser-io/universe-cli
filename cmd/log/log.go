@@ -13,4 +13,5 @@ var (
 
 func init() {
 	LogCmd.AddCommand(ListCmd)
+	LogCmd.AddCommand(WatchCmd)
 }

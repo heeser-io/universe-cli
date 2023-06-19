@@ -5,6 +5,7 @@ import (
 )
 
 var (
+	ConnectionID string
 	WebsocketCmd = &cobra.Command{
 		Use:   "websocket",
 		Short: "websocket api",
@@ -13,4 +14,8 @@ var (
 
 func init() {
 	WebsocketCmd.AddCommand(ListCmd)
+	WebsocketCmd.AddCommand(JoinChannelsCmd)
+	WebsocketCmd.AddCommand(LeaveChannelsCmd)
+
+	WebsocketCmd.PersistentFlags().StringVar(&ConnectionID, "connection-id", "", "connection id")
 }

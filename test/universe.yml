@@ -1,5 +1,14 @@
 project:
   name: universe-cli-test
   branch: test
-keyvalues:
-  - name: 
+functions:
+  - name: test
+    path: bin/test.zip
+    handler: src/index.js
+    language: nodejs18
+    permissions:
+      - "*"
+tasks:
+  - name: test-task
+    interval: "*/15 * * * * * *"
+    functionId: test

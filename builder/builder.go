@@ -20,7 +20,7 @@ import (
 	"github.com/heeser-io/universe-cli/proxy"
 	"github.com/heeser-io/universe-cli/shell"
 	v1 "github.com/heeser-io/universe/api/v1"
-	"github.com/heeser-io/universe/internal/serverless/invoker"
+	"github.com/heeser-io/universe/pkg/serverless/invoker"
 	"github.com/heeser-io/universe/services/gateway"
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog"

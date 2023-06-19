@@ -1,0 +1,10 @@
+{
+  "name": "payment-webhook",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@universecloud/api": "^0.8.1",
+    "universecloud-js": "^0.5.8"
+  }
+}
