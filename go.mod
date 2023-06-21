@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/fatih/color v1.13.0
-	github.com/heeser-io/universe v0.0.0-20230620221527-3b2624d45fd7
+	github.com/heeser-io/universe v0.0.0-20230621145400-e85b5dffaa4d
 	github.com/joho/godotenv v1.4.0
 	gopkg.in/yaml.v2 v2.4.0
 )

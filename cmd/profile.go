@@ -14,4 +14,5 @@ var (
 
 func init() {
 	ProfileCmd.AddCommand(profile.ReadCmd)
+	ProfileCmd.AddCommand(profile.ListCmd)
 }
