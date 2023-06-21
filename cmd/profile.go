@@ -14,5 +14,10 @@ var (
 
 func init() {
 	ProfileCmd.AddCommand(profile.ReadCmd)
+	ProfileCmd.AddCommand(profile.UpdateCmd)
 	ProfileCmd.AddCommand(profile.ListCmd)
+	ProfileCmd.AddCommand(profile.CreateSubprofileCmd)
+	ProfileCmd.AddCommand(profile.ReadSubprofileCmd)
+	ProfileCmd.AddCommand(profile.AddGroupCmd)
+	ProfileCmd.AddCommand(profile.RemoveGroupCmd)
 }
