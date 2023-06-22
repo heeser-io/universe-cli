@@ -34,4 +34,7 @@ func init() {
 	DataCmd.AddCommand(PushArrayCmd)
 	DataCmd.AddCommand(UpdateArrayCmd)
 	DataCmd.AddCommand(RemoveArrayElementCmd)
+	DataCmd.AddCommand(ListIndicesCmd)
+	DataCmd.AddCommand(CreateIndexCmd)
+	DataCmd.AddCommand(DeleteIndexCmd)
 }

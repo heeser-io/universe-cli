@@ -8,6 +8,7 @@ import (
 	"github.com/heeser-io/universe-cli/cmd/data"
 	"github.com/heeser-io/universe-cli/cmd/file"
 	"github.com/heeser-io/universe-cli/cmd/function"
+	"github.com/heeser-io/universe-cli/cmd/job"
 	"github.com/heeser-io/universe-cli/cmd/log"
 	"github.com/heeser-io/universe-cli/cmd/notification"
 	"github.com/heeser-io/universe-cli/cmd/project"
@@ -50,6 +51,7 @@ func init() {
 	rootCmd.AddCommand(quota.QuotaCmd)
 	rootCmd.AddCommand(websocket.WebsocketCmd)
 	rootCmd.AddCommand(task.TaskCmd)
+	rootCmd.AddCommand(job.JobCmd)
 
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "whether to show debug logs or not")
 	rootCmd.PersistentFlags().String("branch", "v", "set a branch")
