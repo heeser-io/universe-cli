@@ -895,6 +895,7 @@ func (b *Builder) buildSubscriptions() error {
 				Name:           subscription.Name,
 				Resource:       subscription.Resource,
 				FunctionID:     cache.Functions[subscription.FunctionID].ID,
+				Reference:      subscription.Reference,
 			}
 
 			subscriptionObj, err := client.Client.Subscription.Update(&updateSubscriptionParams)
@@ -909,6 +910,7 @@ func (b *Builder) buildSubscriptions() error {
 				ProjectID:  projectID,
 				Resource:   subscription.Resource,
 				FunctionID: cache.Functions[subscription.FunctionID].ID,
+				Reference:  subscription.Reference,
 			}
 
 			subscriptionObj, err := client.Client.Subscription.Create(&createSubscriptionParams)
