@@ -981,7 +981,7 @@ func (b *Builder) buildDomains() error {
 	cache := b.cache
 	stack := b.stack
 
-	// projectID := b.getProjectID()
+	projectID := b.getProjectID()
 
 	for _, domain := range stack.Domains {
 		cachedDomains := cache.Domains[domain.Name]
@@ -1010,6 +1010,7 @@ func (b *Builder) buildDomains() error {
 				Name:      domain.Name,
 				GatewayID: gatewayID,
 				Tags:      domain.Tags,
+				ProjectID: projectID,
 			}
 
 			domainObj, err := client.Client.Domain.Create(&createDomainParams)
