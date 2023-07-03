@@ -14,16 +14,17 @@ var (
 	UpdateTags   *[]string
 	UpdateCmd    = &cobra.Command{
 		Use:   "update",
-		Short: "updates a project with the given params",
+		Short: "updates a redirect with the given params",
 		Run: func(cmd *cobra.Command, args []string) {
-			projectObj, err := client.Client.Redirect.Update(&v1.UpdateRedirectParams{
+			redirectObj, err := client.Client.Redirect.Update(&v1.UpdateRedirectParams{
 				RedirectID: RedirectID,
 				Tags:       *UpdateTags,
+				Target:     UpdateTarget,
 			})
 			if err != nil {
 				color.Red("err:%v\n", err)
 			}
-			fmt.Println(string(v1.StructToByte(projectObj)))
+			fmt.Println(string(v1.StructToByte(redirectObj)))
 		},
 	}
 )

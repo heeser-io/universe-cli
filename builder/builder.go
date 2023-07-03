@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -26,6 +26,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/thoas/go-funk"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Builder struct {
@@ -68,6 +69,18 @@ func New(path string, download bool) (*Builder, error) {
 		}
 		cache.Project = projectObj
 		color.Green("successfully created project %s", projectObj.ID)
+	} else if !download {
+		projectObj, err := client.Client.Project.Update(&v1.UpdateProjectParams{
+			ProjectID: cache.Project.ID,
+			Name:      stack.Project.Name,
+			Tags:      stack.Project.Tags,
+			Settings:  *stack.Project.Settings,
+		})
+		if err != nil {
+			panic(err)
+		}
+		cache.Project = projectObj
+		color.Green("successfully updated project %s", projectObj.ID)
 	}
 
 	if cache.Functions == nil {
@@ -198,7 +211,7 @@ func (b *Builder) Serve() error {
 			fnName := strings.Split(task.FunctionID, "function:")[1]
 			fnPort := fnPorts[fnName]
 
-			conn, err := grpc.Dial(fmt.Sprintf("localhost:%d", fnPort), grpc.WithInsecure())
+			conn, err := grpc.Dial(fmt.Sprintf("localhost:%d", fnPort), grpc.WithTransportCredentials(insecure.NewCredentials()))
 			if err != nil {
 				panic(err)
 			}
@@ -222,14 +235,14 @@ func (b *Builder) Serve() error {
 
 func CreateHandlerFunc(port int, route gateway.Route) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		conn, err := grpc.Dial(fmt.Sprintf("localhost:%d", port), grpc.WithInsecure())
+		conn, err := grpc.Dial(fmt.Sprintf("localhost:%d", port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			panic(err)
 		}
 
 		rpcClient := invoker.NewInvokerClient(conn)
 
-		b, err := ioutil.ReadAll(r.Body)
+		b, err := io.ReadAll(r.Body)
 		if err != nil {
 			panic(err)
 		}
@@ -783,7 +796,7 @@ func (b *Builder) buildTemplates() error {
 				log.Println(err)
 				return err
 			}
-			b, err := ioutil.ReadFile(path.Join(wd, filepath))
+			b, err := os.ReadFile(path.Join(wd, filepath))
 			if err != nil {
 				log.Println(err)
 				return err
@@ -1028,8 +1041,6 @@ func (b *Builder) buildWebhooks() error {
 			if extractedVar.Resource == "domain" {
 				targetUrl = fmt.Sprintf("%s%s", cache.Domains[extractedVar.ID].Url, extractedVar.Appendix)
 			}
-		} else {
-
 		}
 		if cachedWebhook != nil {
 			updateWebhookParams := v1.UpdateWebhookParams{
@@ -1070,6 +1081,10 @@ func (b *Builder) buildWebhooks() error {
 }
 
 func (b *Builder) BuildStack(functionName string) error {
+	if err := b.buildKeyValues(); err != nil {
+		return err
+	}
+
 	if err := b.buildTemplates(); err != nil {
 		return err
 	}
