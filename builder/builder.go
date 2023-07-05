@@ -70,12 +70,16 @@ func New(path string, download bool) (*Builder, error) {
 		cache.Project = projectObj
 		color.Green("successfully created project %s", projectObj.ID)
 	} else if !download {
-		projectObj, err := client.Client.Project.Update(&v1.UpdateProjectParams{
+		params := &v1.UpdateProjectParams{
 			ProjectID: cache.Project.ID,
 			Name:      stack.Project.Name,
 			Tags:      stack.Project.Tags,
-			Settings:  *stack.Project.Settings,
-		})
+		}
+		if stack.Project.Settings != nil {
+			params.Settings = *stack.Project.Settings
+		}
+
+		projectObj, err := client.Client.Project.Update(params)
 		if err != nil {
 			panic(err)
 		}
