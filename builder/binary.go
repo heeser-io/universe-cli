@@ -23,6 +23,12 @@ func NewBinaryBuilder(language Language, function v1.Function, path string) *Bin
 }
 
 func (b *BinaryBuilder) Build() (bool, error) {
+	// We want to ensure, that the function folder exists.
+	functionFolder := path.Join(b.path, b.function.Name)
+	_, err := os.ReadDir(functionFolder)
+	if err != nil {
+		return false, fmt.Errorf("function folder %s does not exist", functionFolder)
+	}
 
 	functionPath := path.Join(b.path, b.function.Handler, "main.go")
 	outputFolder := path.Join(b.path, "bin")
@@ -34,8 +40,7 @@ func (b *BinaryBuilder) Build() (bool, error) {
 
 	loggerCtx := logger.WithContext(context.Background())
 
-	err := b.language.build(loggerCtx, functionPath, outputPath)
-	if err != nil {
+	if err := b.language.build(loggerCtx, functionPath, outputPath); err != nil {
 		return false, err
 	}
 
