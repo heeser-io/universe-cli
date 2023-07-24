@@ -546,6 +546,25 @@ func (b *Builder) buildGateways() error {
 	stack := b.stack
 	projectID := b.getProjectID()
 
+	for _, s := range cache.Gateways {
+		// look for deleted ones
+		deleteGateway := funk.Find(stack.Gateways, func(function v1.Gateway) bool {
+			return function.Name == s.Name
+		}) == nil
+
+		if deleteGateway {
+			deleteGatewayParams := v1.DeleteGatewayParams{
+				GatewayID: s.ID,
+			}
+
+			if err := client.Client.Gateway.Delete(&deleteGatewayParams); err != nil {
+				panic(err)
+			}
+			color.Red("gateway %s (%s) deleted", s.Name, s.ID)
+			delete(cache.Gateways, s.Name)
+		}
+	}
+
 	for _, gw := range stack.Gateways {
 		cg := cache.Gateways[gw.Name]
 
@@ -629,6 +648,25 @@ func (b *Builder) buildTasks() error {
 	stack := b.stack
 
 	projectID := b.getProjectID()
+
+	for _, s := range cache.Tasks {
+		// look for deleted ones
+		deleteTask := funk.Find(stack.Tasks, func(function v1.Task) bool {
+			return function.Name == s.Name
+		}) == nil
+
+		if deleteTask {
+			deleteTaskParams := v1.DeleteTaskParams{
+				TaskID: s.ID,
+			}
+
+			if err := client.Client.Task.Delete(&deleteTaskParams); err != nil {
+				panic(err)
+			}
+			color.Red("task %s (%s) deleted", s.Name, s.ID)
+			delete(cache.Tasks, s.Name)
+		}
+	}
 
 	for _, t := range stack.Tasks {
 		ct := cache.Tasks[t.Name]
@@ -785,6 +823,25 @@ func (b *Builder) buildTemplates() error {
 
 	projectID := b.getProjectID()
 
+	for _, s := range cache.Templates {
+		// look for deleted ones
+		deleteTemplate := funk.Find(stack.Templates, func(function v1.Template) bool {
+			return function.Name == s.Name
+		}) == nil
+
+		if deleteTemplate {
+			deleteTemplateParams := v1.DeleteTemplateParams{
+				TemplateID: s.ID,
+			}
+
+			if err := client.Client.Template.Delete(&deleteTemplateParams); err != nil {
+				panic(err)
+			}
+			color.Red("templates %s (%s) deleted", s.Name, s.ID)
+			delete(cache.Templates, s.Name)
+		}
+	}
+
 	for _, t := range stack.Templates {
 		ct := cache.Templates[t.Name]
 
@@ -904,6 +961,25 @@ func (b *Builder) buildSubscriptions() error {
 
 	projectID := b.getProjectID()
 
+	for _, s := range cache.Subscriptions {
+		// look for deleted ones
+		deleteSubscription := funk.Find(stack.Subscriptions, func(function v1.Subscription) bool {
+			return function.Name == s.Name
+		}) == nil
+
+		if deleteSubscription {
+			deleteSubscriptionParams := v1.DeleteSubscriptionParams{
+				SubscriptionID: s.ID,
+			}
+
+			if err := client.Client.Subscription.Delete(&deleteSubscriptionParams); err != nil {
+				panic(err)
+			}
+			color.Red("subscription %s (%s) deleted", s.Name, s.ID)
+			delete(cache.Subscriptions, s.Name)
+		}
+	}
+
 	for _, subscription := range stack.Subscriptions {
 		cachedSubscription := cache.Subscriptions[subscription.Name]
 		if cachedSubscription != nil {
@@ -987,6 +1063,25 @@ func (b *Builder) buildDomains() error {
 
 	projectID := b.getProjectID()
 
+	for _, s := range cache.Domains {
+		// look for deleted ones
+		deleteDomain := funk.Find(stack.Domains, func(function v1.Domain) bool {
+			return function.Name == s.Name
+		}) == nil
+
+		if deleteDomain {
+			deleteDomainParams := v1.DeleteDomainParams{
+				DomainID: s.ID,
+			}
+
+			if err := client.Client.Domain.Delete(&deleteDomainParams); err != nil {
+				panic(err)
+			}
+			color.Red("domains %s (%s) deleted", s.Name, s.ID)
+			delete(cache.Domains, s.Name)
+		}
+	}
+
 	for _, domain := range stack.Domains {
 		cachedDomains := cache.Domains[domain.Name]
 
@@ -1035,6 +1130,25 @@ func (b *Builder) buildWebhooks() error {
 	stack := b.stack
 
 	projectID := b.getProjectID()
+
+	for _, s := range cache.Webhooks {
+		// look for deleted ones
+		deleteWebhook := funk.Find(stack.Webhooks, func(function v1.Webhook) bool {
+			return function.Name == s.Name
+		}) == nil
+
+		if deleteWebhook {
+			deleteWebhookParams := v1.DeleteWebhookParams{
+				WebhookID: s.ID,
+			}
+
+			if err := client.Client.Webhook.Delete(&deleteWebhookParams); err != nil {
+				panic(err)
+			}
+			color.Red("webhook %s (%s) deleted", s.Name, s.ID)
+			delete(cache.Webhooks, s.Name)
+		}
+	}
 
 	for _, webhook := range stack.Webhooks {
 		cachedWebhook := cache.Webhooks[webhook.Name]

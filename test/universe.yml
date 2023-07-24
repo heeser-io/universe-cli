@@ -8,7 +8,10 @@ functions:
     language: nodejs18
     permissions:
       - "*"
-tasks:
-  - name: test-task
-    interval: "*/15 * * * * * *"
-    functionId: test
+gateways:
+  - name: test-gateway
+    routes:
+      - functionId: test
+        path: test
+        method: GET
+        authType: public
