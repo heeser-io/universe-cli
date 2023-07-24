@@ -651,8 +651,8 @@ func (b *Builder) buildTasks() error {
 
 	for _, s := range cache.Tasks {
 		// look for deleted ones
-		deleteTask := funk.Find(stack.Tasks, func(function v1.Task) bool {
-			return function.Name == s.Name
+		deleteTask := funk.Find(stack.Tasks, func(task v1.CreateTaskParams) bool {
+			return task.Name == s.Name
 		}) == nil
 
 		if deleteTask {
@@ -825,8 +825,8 @@ func (b *Builder) buildTemplates() error {
 
 	for _, s := range cache.Templates {
 		// look for deleted ones
-		deleteTemplate := funk.Find(stack.Templates, func(function v1.Template) bool {
-			return function.Name == s.Name
+		deleteTemplate := funk.Find(stack.Templates, func(template v1.Template) bool {
+			return template.Name == s.Name
 		}) == nil
 
 		if deleteTemplate {
@@ -963,8 +963,8 @@ func (b *Builder) buildSubscriptions() error {
 
 	for _, s := range cache.Subscriptions {
 		// look for deleted ones
-		deleteSubscription := funk.Find(stack.Subscriptions, func(function v1.Subscription) bool {
-			return function.Name == s.Name
+		deleteSubscription := funk.Find(stack.Subscriptions, func(subscription v1.Subscription) bool {
+			return subscription.Name == s.Name
 		}) == nil
 
 		if deleteSubscription {
@@ -1065,8 +1065,8 @@ func (b *Builder) buildDomains() error {
 
 	for _, s := range cache.Domains {
 		// look for deleted ones
-		deleteDomain := funk.Find(stack.Domains, func(function v1.Domain) bool {
-			return function.Name == s.Name
+		deleteDomain := funk.Find(stack.Domains, func(domain v1.Domain) bool {
+			return domain.Name == s.Name
 		}) == nil
 
 		if deleteDomain {
@@ -1133,8 +1133,8 @@ func (b *Builder) buildWebhooks() error {
 
 	for _, s := range cache.Webhooks {
 		// look for deleted ones
-		deleteWebhook := funk.Find(stack.Webhooks, func(function v1.Webhook) bool {
-			return function.Name == s.Name
+		deleteWebhook := funk.Find(stack.Webhooks, func(webhook v1.Webhook) bool {
+			return webhook.Name == s.Name
 		}) == nil
 
 		if deleteWebhook {
