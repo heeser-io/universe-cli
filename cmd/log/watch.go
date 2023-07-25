@@ -10,6 +10,7 @@ import (
 
 	"github.com/fatih/color"
 	ws "github.com/gorilla/websocket"
+	"github.com/heeser-io/universe-cli/builder"
 	"github.com/heeser-io/universe-cli/client"
 	"github.com/heeser-io/universe-cli/config"
 	v1 "github.com/heeser-io/universe/api/v1"
@@ -26,16 +27,15 @@ var (
 		Short: "watch live logs for the given resources",
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(*Resources) == 0 {
-				color.Red("please define resources via --resources flag")
-				os.Exit(1)
-			}
-			// 	logs, err := client.Client.Log.List(&v1.ListLogParams{
+				c := builder.LoadOrCreate("")
+				resources := []string{}
 
-			// 	})
-			// 	if err != nil {
-			// 		color.Red("err:%v\n", err)
-			// 	}
-			// 	fmt.Println(string(v1.StructToByte(logs)))
+				for _, function := range c.Functions {
+					resources = append(resources, fmt.Sprintf("function:%s", function.ID))
+				}
+				(*Resources) = resources
+			}
+
 			interrupt := make(chan os.Signal, 1)
 			signal.Notify(interrupt, os.Interrupt)
 
