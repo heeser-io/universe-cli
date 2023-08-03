@@ -5,7 +5,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +14,7 @@ var (
 		Use:   "list-jobs",
 		Short: "list all task jobs for the given task id",
 		Run: func(cmd *cobra.Command, args []string) {
-			tasks, err := client.Client.Task.ListJobs(&v1.ListJobParams{
+			tasks, err := client.Client.Task.ListJobs(&v2.ListJobParams{
 				TaskID:      TaskID,
 				Filter:      Filter,
 				Limit:       Limit,
@@ -28,7 +28,7 @@ var (
 			if err != nil {
 				color.Red("err:%v\n", err)
 			}
-			fmt.Println(string(v1.StructToByte(tasks)))
+			fmt.Println(string(v2.StructToByte(tasks)))
 		},
 	}
 )

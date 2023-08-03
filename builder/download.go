@@ -4,18 +4,18 @@ import (
 	"fmt"
 
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 )
 
-func (b *Builder) ListProjects() ([]v1.Project, error) {
-	projects, err := client.Client.Project.List(&v1.ListProjectParams{})
+func (b *Builder) ListProjects() ([]v2.Project, error) {
+	projects, err := client.Client.Project.List(&v2.ListProjectParams{})
 	if err != nil {
 		return nil, err
 	}
 
 	return projects, nil
 }
-func (b *Builder) Download(project *v1.Project) error {
+func (b *Builder) Download(project *v2.Project) error {
 	// we build our cache and save it so .stack
 
 	filter := map[string]string{
@@ -24,18 +24,18 @@ func (b *Builder) Download(project *v1.Project) error {
 
 	c := Cache{
 		Project:       project,
-		Functions:     map[string]*v1.Function{},
-		Secrets:       map[string]*v1.Secret{},
-		Tasks:         map[string]*v1.Task{},
-		Gateways:      map[string]*v1.Gateway{},
-		Templates:     map[string]*v1.Template{},
-		Subscriptions: map[string]*v1.Subscription{},
-		Domains:       map[string]*v1.Domain{},
-		Filemappings:  map[string][]*v1.File{},
-		Webhooks:      map[string]*v1.Webhook{},
+		Functions:     map[string]*v2.Function{},
+		Secrets:       map[string]*v2.Secret{},
+		Tasks:         map[string]*v2.Task{},
+		Gateways:      map[string]*v2.Gateway{},
+		Templates:     map[string]*v2.Template{},
+		Subscriptions: map[string]*v2.Subscription{},
+		Domains:       map[string]*v2.Domain{},
+		Filemappings:  map[string][]*v2.File{},
+		Webhooks:      map[string]*v2.Webhook{},
 	}
 
-	functions, err := client.Client.Function.List(&v1.ListFunctionParams{
+	functions, err := client.Client.Function.List(&v2.ListFunctionParams{
 		Filter: filter,
 	})
 	if err != nil {
@@ -47,7 +47,7 @@ func (b *Builder) Download(project *v1.Project) error {
 	}
 	// c.Save()
 
-	secrets, err := client.Client.Secret.List(&v1.ListSecretParams{
+	secrets, err := client.Client.Secret.List(&v2.ListSecretParams{
 		Filter: filter,
 	})
 	if err != nil {
@@ -58,7 +58,7 @@ func (b *Builder) Download(project *v1.Project) error {
 		c.Secrets[secretObj.Name] = &secretObjCopy
 	}
 
-	gateways, err := client.Client.Gateway.List(&v1.ListGatewayParams{
+	gateways, err := client.Client.Gateway.List(&v2.ListGatewayParams{
 		Filter: filter,
 	})
 	if err != nil {
@@ -69,7 +69,7 @@ func (b *Builder) Download(project *v1.Project) error {
 		c.Gateways[gatewayObj.Name] = &gatewayObjCopy
 	}
 
-	subscriptions, err := client.Client.Subscription.List(&v1.ListSubscriptionParams{
+	subscriptions, err := client.Client.Subscription.List(&v2.ListSubscriptionParams{
 		Filter: filter,
 	})
 	if err != nil {
@@ -80,7 +80,7 @@ func (b *Builder) Download(project *v1.Project) error {
 		c.Subscriptions[subscriptionObj.Name] = &subscriptionObjCopy
 	}
 
-	templates, err := client.Client.Template.List(&v1.ListTemplateParams{
+	templates, err := client.Client.Template.List(&v2.ListTemplateParams{
 		Filter: filter,
 	})
 	if err != nil {
@@ -91,7 +91,7 @@ func (b *Builder) Download(project *v1.Project) error {
 		c.Templates[templateObj.Name] = &templateObjCopy
 	}
 
-	webhooks, err := client.Client.Webhook.List(&v1.ListWebhookParams{
+	webhooks, err := client.Client.Webhook.List(&v2.ListWebhookParams{
 		Filter: filter,
 	})
 	if err != nil {
@@ -102,7 +102,7 @@ func (b *Builder) Download(project *v1.Project) error {
 		c.Webhooks[webhookObj.Name] = &webhookObjCopy
 	}
 
-	tasks, err := client.Client.Task.List(&v1.ListTaskParams{
+	tasks, err := client.Client.Task.List(&v2.ListTaskParams{
 		Filter: filter,
 	})
 	if err != nil {
@@ -113,7 +113,7 @@ func (b *Builder) Download(project *v1.Project) error {
 		c.Tasks[taskObj.Name] = &taskObjCopy
 	}
 
-	domains, err := client.Client.Domain.List(&v1.ListDomainParams{
+	domains, err := client.Client.Domain.List(&v2.ListDomainParams{
 		Filter: filter,
 	})
 	if err != nil {
@@ -124,7 +124,7 @@ func (b *Builder) Download(project *v1.Project) error {
 		c.Domains[domainObj.Name] = &domainObjCopy
 	}
 
-	oauth, err := client.Client.OAuth.List(&v1.ListOAuthParams{
+	oauth, err := client.Client.OAuth.List(&v2.ListOAuthParams{
 		Filter: filter,
 	})
 	if err != nil {
@@ -134,7 +134,7 @@ func (b *Builder) Download(project *v1.Project) error {
 		c.OAuth = &oauth[0]
 	}
 
-	keyvalues, err := client.Client.KeyValue.List(&v1.ListKeyValueParams{
+	keyvalues, err := client.Client.KeyValue.List(&v2.ListKeyValueParams{
 		Filter: filter,
 	})
 	if err != nil {

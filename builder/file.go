@@ -9,18 +9,18 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 )
 
 type Filemapping struct {
 	Name  string
 	Path  string
-	Files []*v1.File
+	Files []*v2.File
 	Tags  []string
 }
 
-func (fm *Filemapping) Upload(projectID string) ([]*v1.File, error) {
-	files := []*v1.File{}
+func (fm *Filemapping) Upload(projectID string) ([]*v2.File, error) {
+	files := []*v2.File{}
 
 	fileInfo, err := os.Stat(fm.Path)
 	if err != nil {
@@ -44,7 +44,7 @@ func (fm *Filemapping) Upload(projectID string) ([]*v1.File, error) {
 					return err
 				}
 
-				var eFile *v1.File
+				var eFile *v2.File
 				for _, f := range fm.Files {
 					if strings.Contains(f.Ref.Key, path.Join(p)) {
 						eFile = f
@@ -56,12 +56,12 @@ func (fm *Filemapping) Upload(projectID string) ([]*v1.File, error) {
 				}
 
 				color.Yellow("uploading file %s...", p)
-				fileRes, err := client.Client.File.RawUpload(&v1.UploadAndCreateParams{
+				fileRes, err := client.Client.File.RawUpload(&v2.UploadAndCreateParams{
 					Path: dir,
 					Files: map[string]*os.File{
 						filename: f,
 					},
-					Level:     v1.LEVEL_PUBLIC,
+					Level:     v2.LEVEL_PUBLIC,
 					ProjectID: projectID,
 					Tags:      fm.Tags,
 				})
@@ -82,7 +82,7 @@ func (fm *Filemapping) Upload(projectID string) ([]*v1.File, error) {
 		}
 		defer f.Close()
 
-		fileRes, err := client.Client.File.RawUpload(&v1.UploadAndCreateParams{
+		fileRes, err := client.Client.File.RawUpload(&v2.UploadAndCreateParams{
 			ProjectID: projectID,
 			Files: map[string]*os.File{
 				"file": f,

@@ -2,7 +2,7 @@ package builder
 
 import (
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 )
 
 func (b *Builder) HasChange() bool {
@@ -17,7 +17,7 @@ func (b *Builder) HasChange() bool {
 func (b *Builder) Verify() {
 	cache := LoadOrCreate(b.path)
 
-	p, err := client.Client.Project.Read(&v1.ReadProjectParams{
+	p, err := client.Client.Project.Read(&v2.ReadProjectParams{
 		ProjectID: cache.Project.ID,
 	})
 	if err != nil {
@@ -26,7 +26,7 @@ func (b *Builder) Verify() {
 	cache.Project = p
 
 	if cache.OAuth != nil {
-		oauth, err := client.Client.OAuth.Read(&v1.ReadOAuthParams{
+		oauth, err := client.Client.OAuth.Read(&v2.ReadOAuthParams{
 			OAuthID: cache.OAuth.ID,
 		})
 		if err != nil {
@@ -36,7 +36,7 @@ func (b *Builder) Verify() {
 	}
 
 	for _, secretObj := range cache.Secrets {
-		readSecretParams := &v1.ReadSecretParams{
+		readSecretParams := &v2.ReadSecretParams{
 			SecretID: secretObj.ID,
 		}
 
@@ -48,7 +48,7 @@ func (b *Builder) Verify() {
 	}
 
 	for _, functionObj := range cache.Functions {
-		readFunctionParams := &v1.ReadFunctionParams{
+		readFunctionParams := &v2.ReadFunctionParams{
 			FunctionID: functionObj.ID,
 		}
 
@@ -61,7 +61,7 @@ func (b *Builder) Verify() {
 	}
 
 	for _, gatewayObj := range cache.Gateways {
-		readGatewayParams := &v1.ReadGatewayParams{
+		readGatewayParams := &v2.ReadGatewayParams{
 			GatewayID: gatewayObj.ID,
 		}
 
@@ -73,7 +73,7 @@ func (b *Builder) Verify() {
 	}
 
 	for _, taskObj := range cache.Tasks {
-		readTaskParams := &v1.ReadTaskParams{
+		readTaskParams := &v2.ReadTaskParams{
 			TaskID: taskObj.ID,
 		}
 

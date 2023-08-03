@@ -5,7 +5,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +14,7 @@ var (
 		Use:   "remove-group",
 		Short: "remove a group from root or sub account",
 		Run: func(cmd *cobra.Command, args []string) {
-			p, err := client.Client.Profile.RemoveGroup(&v1.RemoveGroupParams{
+			p, err := client.Client.Profile.RemoveGroup(&v2.RemoveGroupParams{
 				Group:     Group,
 				AccountID: AccountID,
 				ClientID:  ClientID,
@@ -22,7 +22,7 @@ var (
 			if err != nil {
 				color.Red(err.Error())
 			}
-			fmt.Println(string(v1.StructToByte(p)))
+			fmt.Println(string(v2.StructToByte(p)))
 		},
 	}
 )

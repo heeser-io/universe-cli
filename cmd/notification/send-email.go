@@ -3,7 +3,7 @@ package notification
 import (
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +20,7 @@ var (
 		Use:   "send-email",
 		Short: "sends an email with the given parameters",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := client.Client.Email.SendEmail(&v1.SendEmailParams{
+			err := client.Client.Email.SendEmail(&v2.SendEmailParams{
 				Receiver:   *Receiver,
 				CC:         *CC,
 				Subject:    Subject,

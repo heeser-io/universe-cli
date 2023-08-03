@@ -5,7 +5,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +18,7 @@ var (
 			if err != nil {
 				color.Red("err:%v\n", err)
 			}
-			fmt.Println(string(v1.StructToByte(authParams)))
+			fmt.Println(string(v2.StructToByte(authParams)))
 		},
 	}
 )

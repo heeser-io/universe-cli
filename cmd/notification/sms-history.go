@@ -5,7 +5,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +14,7 @@ var (
 		Use:   "sms-history",
 		Short: "list sms history for the current authenticated user",
 		Run: func(cmd *cobra.Command, args []string) {
-			smsHistory, err := client.Client.SMS.ListHistory(&v1.ListSMSHistoryParams{
+			smsHistory, err := client.Client.SMS.ListHistory(&v2.ListSMSHistoryParams{
 				Filter:      Filter,
 				Limit:       Limit,
 				Sort:        Sort,
@@ -27,7 +27,7 @@ var (
 			if err != nil {
 				color.Red("err:%v\n", err)
 			}
-			fmt.Println(string(v1.StructToByte(smsHistory)))
+			fmt.Println(string(v2.StructToByte(smsHistory)))
 		},
 	}
 )

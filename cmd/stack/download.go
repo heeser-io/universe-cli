@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/heeser-io/universe-cli/builder"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/thoas/go-funk"
@@ -40,9 +40,9 @@ var (
 				panic(err)
 			}
 
-			selectedProject, ok := (funk.Find(projects, func(p v1.Project) bool {
+			selectedProject, ok := (funk.Find(projects, func(p v2.Project) bool {
 				return fmt.Sprintf("%s (%s)", p.Name, p.ID) == result
-			})).(v1.Project)
+			})).(v2.Project)
 
 			if !ok {
 				panic("unexpected error")

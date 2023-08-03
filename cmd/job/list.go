@@ -5,7 +5,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +22,7 @@ var (
 		Use:   "list",
 		Short: "list all jobs for the current authenticated user",
 		Run: func(cmd *cobra.Command, args []string) {
-			jobs, err := client.Client.Job.List(&v1.ListJobParams{
+			jobs, err := client.Client.Job.List(&v2.ListJobParams{
 				Filter:      Filter,
 				Limit:       Limit,
 				Sort:        Sort,
@@ -35,7 +35,7 @@ var (
 			if err != nil {
 				color.Red("err:%v\n", err)
 			}
-			fmt.Println(string(v1.StructToByte(jobs)))
+			fmt.Println(string(v2.StructToByte(jobs)))
 		},
 	}
 )

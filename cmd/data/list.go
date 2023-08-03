@@ -6,7 +6,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -34,7 +34,7 @@ var (
 				}
 			}
 
-			datas, err := client.Client.Data.List(&v1.ListDataParams{
+			datas, err := client.Client.Data.List(&v2.ListDataParams{
 				CollectionName: CollectionName,
 				Filter:         Filter,
 				Limit:          Limit,
@@ -49,7 +49,7 @@ var (
 			if err != nil {
 				color.Red("err:%v\n", err)
 			}
-			fmt.Println(string(v1.StructToByte(datas)))
+			fmt.Println(string(v2.StructToByte(datas)))
 		},
 	}
 )

@@ -3,7 +3,7 @@ package oauth
 import (
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -12,7 +12,7 @@ var (
 		Use:   "delete",
 		Short: "deletes an oauth app with the given params",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := client.Client.OAuth.Delete(&v1.DeleteOAuthParams{
+			err := client.Client.OAuth.Delete(&v2.DeleteOAuthParams{
 				OAuthID: OAuthID,
 			})
 			if err != nil {

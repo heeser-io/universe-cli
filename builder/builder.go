@@ -19,9 +19,9 @@ import (
 	"github.com/heeser-io/universe-cli/helper"
 	"github.com/heeser-io/universe-cli/proxy"
 	"github.com/heeser-io/universe-cli/shell"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/heeser-io/universe/pkg/serverless/invoker"
-	"github.com/heeser-io/universe/services/v1/gateway"
+	"github.com/heeser-io/universe/services/v2/gateway"
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog"
 	"github.com/thoas/go-funk"
@@ -60,7 +60,7 @@ func New(path string, download bool) (*Builder, error) {
 	}
 
 	if cache.Project == nil && !download {
-		projectObj, err := client.Client.Project.Create(&v1.CreateProjectParams{
+		projectObj, err := client.Client.Project.Create(&v2.CreateProjectParams{
 			Name: stack.Project.Name,
 			Tags: stack.Project.Tags,
 		})
@@ -70,7 +70,7 @@ func New(path string, download bool) (*Builder, error) {
 		cache.Project = projectObj
 		color.Green("successfully created project %s", projectObj.ID)
 	} else if !download {
-		params := &v1.UpdateProjectParams{
+		params := &v2.UpdateProjectParams{
 			ProjectID: cache.Project.ID,
 			Name:      stack.Project.Name,
 			Tags:      stack.Project.Tags,
@@ -88,31 +88,31 @@ func New(path string, download bool) (*Builder, error) {
 	}
 
 	if cache.Functions == nil {
-		cache.Functions = make(map[string]*v1.Function)
+		cache.Functions = make(map[string]*v2.Function)
 	}
 
 	if cache.Gateways == nil {
-		cache.Gateways = make(map[string]*v1.Gateway)
+		cache.Gateways = make(map[string]*v2.Gateway)
 	}
 
 	if cache.Functions == nil {
-		cache.Functions = make(map[string]*v1.Function)
+		cache.Functions = make(map[string]*v2.Function)
 	}
 
 	if cache.Secrets == nil {
-		cache.Secrets = make(map[string]*v1.Secret)
+		cache.Secrets = make(map[string]*v2.Secret)
 	}
 
 	if cache.Tasks == nil {
-		cache.Tasks = make(map[string]*v1.Task)
+		cache.Tasks = make(map[string]*v2.Task)
 	}
 
 	if cache.Filemappings == nil {
-		cache.Filemappings = make(map[string][]*v1.File)
+		cache.Filemappings = make(map[string][]*v2.File)
 	}
 
 	if cache.Subscriptions == nil {
-		cache.Subscriptions = make(map[string]*v1.Subscription)
+		cache.Subscriptions = make(map[string]*v2.Subscription)
 	}
 
 	cache.Save()
@@ -155,11 +155,11 @@ func (b *Builder) Serve() error {
 
 			for key, value := range function.Environment {
 				if strings.Contains(value, "secret:") {
-					secretValue := funk.Find(stack.Secrets, func(x v1.Secret) bool {
+					secretValue := funk.Find(stack.Secrets, func(x v2.Secret) bool {
 						return x.Name == strings.Split(value, "secret:")[1]
 					})
 
-					secretObj, ok := secretValue.(v1.Secret)
+					secretObj, ok := secretValue.(v2.Secret)
 					if !ok {
 						panic(fmt.Errorf("secret value %s does not exist", value))
 					}
@@ -263,7 +263,7 @@ func CreateHandlerFunc(port int, route gateway.Route) func(w http.ResponseWriter
 			headers[k] = v[0]
 		}
 
-		profileObj, err := client.Client.Profile.Read(&v1.ReadProfileParams{})
+		profileObj, err := client.Client.Profile.Read(&v2.ReadProfileParams{})
 		if err != nil {
 			panic(err)
 		}
@@ -303,12 +303,12 @@ func (b *Builder) buildKeyValues() error {
 
 	for _, kv := range cache.KeyValues {
 		// look for deleted ones
-		deleteKeyValue := funk.Find(stack.KeyValues, func(keyvalue v1.KeyValue) bool {
+		deleteKeyValue := funk.Find(stack.KeyValues, func(keyvalue v2.KeyValue) bool {
 			return keyvalue.Namespace == kv.Namespace && keyvalue.Key == kv.Key
 		}) == nil
 
 		if deleteKeyValue {
-			deleteKeyvalueParams := v1.DeleteKeyValueParams{
+			deleteKeyvalueParams := v2.DeleteKeyValueParams{
 				Namespace: kv.Namespace,
 				Key:       kv.Key,
 			}
@@ -327,7 +327,7 @@ func (b *Builder) buildKeyValues() error {
 
 		if ckv != nil {
 			color.Yellow("keyvalue %s.%s exists", kv.Namespace, kv.Key)
-			updateKeyvalueParams := v1.UpdateKeyValueParams{
+			updateKeyvalueParams := v2.UpdateKeyValueParams{
 				Key:       kv.Key,
 				Namespace: kv.Namespace,
 				Value:     kv.Value,
@@ -341,7 +341,7 @@ func (b *Builder) buildKeyValues() error {
 			color.Green("successfully updated keyvalue %s.%s (%s)", kv.Namespace, kv.Key, keyvalueObj.ID)
 			ckv = keyvalueObj
 		} else {
-			createKeyValue := v1.CreateKeyValueParams{
+			createKeyValue := v2.CreateKeyValueParams{
 				ProjectID: projectID,
 				Namespace: kv.Namespace,
 				Key:       kv.Key,
@@ -374,12 +374,12 @@ func (b *Builder) buildFunctions(functionName string) error {
 
 	for _, s := range cache.Functions {
 		// look for deleted ones
-		deleteFunction := funk.Find(stack.Functions, func(function v1.Function) bool {
+		deleteFunction := funk.Find(stack.Functions, func(function v2.Function) bool {
 			return function.Name == s.Name
 		}) == nil
 
 		if deleteFunction {
-			deleteFunctionParams := v1.DeleteFunctionParams{
+			deleteFunctionParams := v2.DeleteFunctionParams{
 				FunctionID: s.ID,
 			}
 
@@ -400,7 +400,7 @@ func (b *Builder) buildFunctions(functionName string) error {
 		}
 
 		wg.Add(1)
-		go func(function v1.Function) error {
+		go func(function v2.Function) error {
 			lang := NewLanguage(function.Language)
 			binaryBuilder := NewBinaryBuilder(lang, function, path.Join(stack.BasePath, b.path))
 			_, err := binaryBuilder.Build()
@@ -460,7 +460,7 @@ func (b *Builder) buildFunctions(functionName string) error {
 				// update file and function
 
 				if checksum != cf.Checksum {
-					functionObj, err := UpdateFunction(&v1.UpdateFunctionParams{
+					functionObj, err := UpdateFunction(&v2.UpdateFunctionParams{
 						FunctionID:  cf.ID,
 						Path:        path.Join(stack.BasePath, b.path, function.Path),
 						Checksum:    &checksum,
@@ -495,7 +495,7 @@ func (b *Builder) buildFunctions(functionName string) error {
 				}
 			} else {
 				// Create function
-				functionObj, err := CreateFunction(&v1.Function{
+				functionObj, err := CreateFunction(&v2.Function{
 					Path:        path.Join(stack.BasePath, b.path, function.Path),
 					Handler:     function.Handler,
 					Checksum:    checksum,
@@ -548,12 +548,12 @@ func (b *Builder) buildGateways() error {
 
 	for _, s := range cache.Gateways {
 		// look for deleted ones
-		deleteGateway := funk.Find(stack.Gateways, func(function v1.Gateway) bool {
+		deleteGateway := funk.Find(stack.Gateways, func(function v2.Gateway) bool {
 			return function.Name == s.Name
 		}) == nil
 
 		if deleteGateway {
-			deleteGatewayParams := v1.DeleteGatewayParams{
+			deleteGatewayParams := v2.DeleteGatewayParams{
 				GatewayID: s.ID,
 			}
 
@@ -587,7 +587,7 @@ func (b *Builder) buildGateways() error {
 					Cache:        r.Cache,
 				})
 			}
-			updateGatewayParams := v1.UpdateGatewayParams{
+			updateGatewayParams := v2.UpdateGatewayParams{
 				GatewayID: cg.ID,
 				Routes:    routes,
 				Tags:      gw.Tags,
@@ -619,7 +619,7 @@ func (b *Builder) buildGateways() error {
 					Cache:        r.Cache,
 				})
 			}
-			createGatewayParams := v1.CreateGatewayParams{
+			createGatewayParams := v2.CreateGatewayParams{
 				ProjectID: projectID,
 				Name:      gw.Name,
 				Routes:    routes,
@@ -651,12 +651,12 @@ func (b *Builder) buildTasks() error {
 
 	for _, s := range cache.Tasks {
 		// look for deleted ones
-		deleteTask := funk.Find(stack.Tasks, func(task v1.CreateTaskParams) bool {
+		deleteTask := funk.Find(stack.Tasks, func(task v2.CreateTaskParams) bool {
 			return task.Name == s.Name
 		}) == nil
 
 		if deleteTask {
-			deleteTaskParams := v1.DeleteTaskParams{
+			deleteTaskParams := v2.DeleteTaskParams{
 				TaskID: s.ID,
 			}
 
@@ -685,7 +685,7 @@ func (b *Builder) buildTasks() error {
 				}
 			}
 
-			updateTaskParams := v1.UpdateTaskParams{
+			updateTaskParams := v2.UpdateTaskParams{
 				TaskID:     ct.ID,
 				FunctionID: cache.Functions[functionID].ID,
 				Interval:   t.Interval,
@@ -710,7 +710,7 @@ func (b *Builder) buildTasks() error {
 				}
 			}
 
-			createTaskParams := v1.CreateTaskParams{
+			createTaskParams := v2.CreateTaskParams{
 				Name:       t.Name,
 				Tags:       t.Tags,
 				FunctionID: cache.Functions[functionID].ID,
@@ -743,12 +743,12 @@ func (b *Builder) buildSecrets() error {
 
 	for _, s := range cache.Secrets {
 		// look for deleted ones
-		deleteSecret := funk.Find(stack.Secrets, func(secret v1.Secret) bool {
+		deleteSecret := funk.Find(stack.Secrets, func(secret v2.Secret) bool {
 			return secret.Name == s.Name
 		}) == nil
 
 		if deleteSecret {
-			deleteSecretParams := v1.DeleteSecretParams{
+			deleteSecretParams := v2.DeleteSecretParams{
 				SecretID: s.ID,
 			}
 
@@ -781,7 +781,7 @@ func (b *Builder) buildSecrets() error {
 
 		if cg != nil {
 			color.Yellow("secret %s exists", s.Name)
-			updateSecretParams := v1.UpdateSecretParams{
+			updateSecretParams := v2.UpdateSecretParams{
 				SecretID: cg.ID,
 				Name:     s.Name,
 				Tags:     s.Tags,
@@ -796,7 +796,7 @@ func (b *Builder) buildSecrets() error {
 			color.Green("successfully updated secret %s", secretObj.ID)
 			cg = secretObj
 		} else {
-			createSecretParams := v1.CreateSecretParams{
+			createSecretParams := v2.CreateSecretParams{
 				ProjectID: projectID,
 				Value:     secretValue,
 				Tags:      s.Tags,
@@ -825,12 +825,12 @@ func (b *Builder) buildTemplates() error {
 
 	for _, s := range cache.Templates {
 		// look for deleted ones
-		deleteTemplate := funk.Find(stack.Templates, func(template v1.Template) bool {
+		deleteTemplate := funk.Find(stack.Templates, func(template v2.Template) bool {
 			return template.Name == s.Name
 		}) == nil
 
 		if deleteTemplate {
-			deleteTemplateParams := v1.DeleteTemplateParams{
+			deleteTemplateParams := v2.DeleteTemplateParams{
 				TemplateID: s.ID,
 			}
 
@@ -868,7 +868,7 @@ func (b *Builder) buildTemplates() error {
 
 		if ct != nil {
 			color.Yellow("template %s exists", t.Name)
-			updateTemplateParams := v1.UpdateTemplateParams{
+			updateTemplateParams := v2.UpdateTemplateParams{
 				TemplateID: ct.ID,
 				Name:       t.Name,
 				Tags:       t.Tags,
@@ -883,7 +883,7 @@ func (b *Builder) buildTemplates() error {
 
 			ct = templateObj
 		} else {
-			createTemplateParams := v1.CreateTemplateParams{
+			createTemplateParams := v2.CreateTemplateParams{
 				ProjectID: projectID,
 				Name:      t.Name,
 				Tags:      t.Tags,
@@ -918,7 +918,7 @@ func (b *Builder) buildOAuth() error {
 	if stack.OAuth.App.ClientName != "" {
 		if co != nil {
 			color.Yellow("oauth %s exists", co.ID)
-			updateOAuthParams := v1.UpdateOAuthParams{
+			updateOAuthParams := v2.UpdateOAuthParams{
 				OAuthID:      co.ID,
 				RedirectUrls: stack.OAuth.App.RedirectUrls,
 				LogoutUrls:   stack.OAuth.App.LogoutUrls,
@@ -932,7 +932,7 @@ func (b *Builder) buildOAuth() error {
 
 			co = oauthObj
 		} else {
-			createOAuthParams := v1.CreateOAuthParams{
+			createOAuthParams := v2.CreateOAuthParams{
 				ProjectID:    projectID,
 				RedirectUrls: stack.OAuth.App.RedirectUrls,
 				LogoutUrls:   stack.OAuth.App.LogoutUrls,
@@ -963,12 +963,12 @@ func (b *Builder) buildSubscriptions() error {
 
 	for _, s := range cache.Subscriptions {
 		// look for deleted ones
-		deleteSubscription := funk.Find(stack.Subscriptions, func(subscription v1.Subscription) bool {
+		deleteSubscription := funk.Find(stack.Subscriptions, func(subscription v2.Subscription) bool {
 			return subscription.Name == s.Name
 		}) == nil
 
 		if deleteSubscription {
-			deleteSubscriptionParams := v1.DeleteSubscriptionParams{
+			deleteSubscriptionParams := v2.DeleteSubscriptionParams{
 				SubscriptionID: s.ID,
 			}
 
@@ -983,7 +983,7 @@ func (b *Builder) buildSubscriptions() error {
 	for _, subscription := range stack.Subscriptions {
 		cachedSubscription := cache.Subscriptions[subscription.Name]
 		if cachedSubscription != nil {
-			updateSubscriptionParams := v1.UpdateSubscriptionParams{
+			updateSubscriptionParams := v2.UpdateSubscriptionParams{
 				SubscriptionID: cachedSubscription.ID,
 				Name:           subscription.Name,
 				Resource:       subscription.Resource,
@@ -998,7 +998,7 @@ func (b *Builder) buildSubscriptions() error {
 			color.Green("successfully updated subscription %s (%s)", subscriptionObj.Name, subscriptionObj.ID)
 			cachedSubscription = subscriptionObj
 		} else {
-			createSubscriptionParams := v1.CreateSubscriptionParams{
+			createSubscriptionParams := v2.CreateSubscriptionParams{
 				Name:       subscription.Name,
 				ProjectID:  projectID,
 				Resource:   subscription.Resource,
@@ -1032,7 +1032,7 @@ func (b *Builder) buildFiles() error {
 			Tags:  filemapping.Tags,
 			Path:  path.Join(b.path, filemapping.Path),
 		}
-		var files []*v1.File
+		var files []*v2.File
 		var err error
 
 		// if cacheFiles is nil, we need to use the filemapping of the stack
@@ -1065,12 +1065,12 @@ func (b *Builder) buildDomains() error {
 
 	for _, s := range cache.Domains {
 		// look for deleted ones
-		deleteDomain := funk.Find(stack.Domains, func(domain v1.Domain) bool {
+		deleteDomain := funk.Find(stack.Domains, func(domain v2.Domain) bool {
 			return domain.Name == s.Name
 		}) == nil
 
 		if deleteDomain {
-			deleteDomainParams := v1.DeleteDomainParams{
+			deleteDomainParams := v2.DeleteDomainParams{
 				DomainID: s.ID,
 			}
 
@@ -1093,7 +1093,7 @@ func (b *Builder) buildDomains() error {
 		}
 
 		if cachedDomains != nil {
-			updateDomainParams := v1.UpdateDomainParams{
+			updateDomainParams := v2.UpdateDomainParams{
 				DomainID: cachedDomains.ID,
 				Tags:     domain.Tags,
 			}
@@ -1105,7 +1105,7 @@ func (b *Builder) buildDomains() error {
 			color.Green("successfully updated domain %s (%s)", domainObj.Name, domainObj.ID)
 			cachedDomains = domainObj
 		} else {
-			createDomainParams := v1.CreateDomainParams{
+			createDomainParams := v2.CreateDomainParams{
 				Name:      domain.Name,
 				GatewayID: gatewayID,
 				Tags:      domain.Tags,
@@ -1133,12 +1133,12 @@ func (b *Builder) buildWebhooks() error {
 
 	for _, s := range cache.Webhooks {
 		// look for deleted ones
-		deleteWebhook := funk.Find(stack.Webhooks, func(webhook v1.Webhook) bool {
+		deleteWebhook := funk.Find(stack.Webhooks, func(webhook v2.Webhook) bool {
 			return webhook.Name == s.Name
 		}) == nil
 
 		if deleteWebhook {
-			deleteWebhookParams := v1.DeleteWebhookParams{
+			deleteWebhookParams := v2.DeleteWebhookParams{
 				WebhookID: s.ID,
 			}
 
@@ -1162,7 +1162,7 @@ func (b *Builder) buildWebhooks() error {
 			}
 		}
 		if cachedWebhook != nil {
-			updateWebhookParams := v1.UpdateWebhookParams{
+			updateWebhookParams := v2.UpdateWebhookParams{
 				WebhookID: cachedWebhook.ID,
 				Name:      webhook.Name,
 				Resources: webhook.Resources,
@@ -1178,7 +1178,7 @@ func (b *Builder) buildWebhooks() error {
 			color.Green("successfully updated webhook %s (%s)", webhookObj.Name, webhookObj.ID)
 			cachedWebhook = webhookObj
 		} else {
-			createWebhookParams := v1.CreateWebhookParams{
+			createWebhookParams := v2.CreateWebhookParams{
 				Name:      webhook.Name,
 				ProjectID: projectID,
 				TargetUrl: targetUrl,

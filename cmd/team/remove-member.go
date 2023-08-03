@@ -3,7 +3,7 @@ package team
 import (
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +13,7 @@ var (
 		Use:   "remove-member",
 		Short: "removes a team member with the given params",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := client.Client.Team.RemoveMember(&v1.RemoveMemberParams{
+			err := client.Client.Team.RemoveMember(&v2.RemoveMemberParams{
 				TeamID: TeamID,
 				Email:  RemoveMemberEmail,
 			})

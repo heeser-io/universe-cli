@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +15,7 @@ var (
 		Use:   "update",
 		Short: "updates a team with the given team id",
 		Run: func(cmd *cobra.Command, args []string) {
-			team, err := client.Client.Team.Update(&v1.UpdateTeamParams{
+			team, err := client.Client.Team.Update(&v2.UpdateTeamParams{
 				TeamID: TeamID,
 				Name:   UpdateName,
 				Slug:   UpdateSlug,
@@ -24,7 +24,7 @@ var (
 				panic(err)
 			}
 
-			fmt.Println(string(v1.StructToByte(team)))
+			fmt.Println(string(v2.StructToByte(team)))
 		},
 	}
 )

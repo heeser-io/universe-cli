@@ -6,7 +6,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +18,7 @@ var (
 		Use:   "remove-array-element",
 		Short: "removes an element from a given array inside a data object",
 		Run: func(cmd *cobra.Command, args []string) {
-			params := &v1.RemoveDataArrayElementParams{
+			params := &v2.RemoveDataArrayElementParams{
 				CollectionName: CollectionName,
 				IndexName:      IndexName,
 				IndexValue:     IndexValue,
@@ -56,7 +56,7 @@ var (
 			if err != nil {
 				color.Red("err:%v\n", err)
 			}
-			fmt.Println(string(v1.StructToByte(dataObj)))
+			fmt.Println(string(v2.StructToByte(dataObj)))
 		},
 	}
 )

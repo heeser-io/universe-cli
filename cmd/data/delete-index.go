@@ -5,7 +5,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +15,7 @@ var (
 		Use:   "delete-index",
 		Short: "deletes an index from a collection",
 		Run: func(cmd *cobra.Command, args []string) {
-			dataObj, err := client.Client.Data.DeleteIndex(&v1.DeleteIndexParams{
+			dataObj, err := client.Client.Data.DeleteIndex(&v2.DeleteIndexParams{
 				CollectionName: CollectionName,
 				IndexName:      IndexName,
 			})
@@ -23,7 +23,7 @@ var (
 				color.Red("err:%v\n", err)
 				return
 			}
-			fmt.Println(string(v1.StructToByte(dataObj)))
+			fmt.Println(string(v2.StructToByte(dataObj)))
 		},
 	}
 )

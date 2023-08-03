@@ -8,17 +8,17 @@ import (
 	"time"
 
 	"github.com/heeser-io/universe-cli/shell"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/rs/zerolog"
 )
 
 type BinaryBuilder struct {
 	language Language
-	function v1.Function
+	function v2.Function
 	path     string
 }
 
-func NewBinaryBuilder(language Language, function v1.Function, path string) *BinaryBuilder {
+func NewBinaryBuilder(language Language, function v2.Function, path string) *BinaryBuilder {
 	return &BinaryBuilder{language, function, path}
 }
 

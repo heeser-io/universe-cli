@@ -3,13 +3,13 @@ package builder
 import (
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 )
 
 func (b *Builder) RemoveStack() {
 	cache := LoadOrCreate(b.path)
 
-	if err := client.Client.Project.Delete(&v1.DeleteProjectParams{
+	if err := client.Client.Project.Delete(&v2.DeleteProjectParams{
 		ProjectID: cache.Project.ID,
 	}); err != nil {
 		color.Red("no project with %s ", cache.Project.ID)
@@ -19,7 +19,7 @@ func (b *Builder) RemoveStack() {
 
 	if cache.OAuth != nil {
 		// remove oauth
-		if err := client.Client.OAuth.Delete(&v1.DeleteOAuthParams{
+		if err := client.Client.OAuth.Delete(&v2.DeleteOAuthParams{
 			OAuthID: cache.OAuth.ID,
 		}); err != nil {
 			panic(err)
@@ -29,7 +29,7 @@ func (b *Builder) RemoveStack() {
 
 	// remove secrets
 	for _, s := range cache.Secrets {
-		if err := client.Client.Secret.Delete(&v1.DeleteSecretParams{
+		if err := client.Client.Secret.Delete(&v2.DeleteSecretParams{
 			SecretID: s.ID,
 		}); err != nil {
 			panic(err)
@@ -39,7 +39,7 @@ func (b *Builder) RemoveStack() {
 
 	// remove functions
 	for _, f := range cache.Functions {
-		if err := client.Client.Function.Delete(&v1.DeleteFunctionParams{
+		if err := client.Client.Function.Delete(&v2.DeleteFunctionParams{
 			FunctionID: f.ID,
 		}); err != nil {
 			panic(err)
@@ -49,7 +49,7 @@ func (b *Builder) RemoveStack() {
 
 	// remove gateways
 	for _, g := range cache.Gateways {
-		if err := client.Client.Gateway.Delete(&v1.DeleteGatewayParams{
+		if err := client.Client.Gateway.Delete(&v2.DeleteGatewayParams{
 			GatewayID: g.ID,
 		}); err != nil {
 			panic(err)
@@ -58,7 +58,7 @@ func (b *Builder) RemoveStack() {
 	}
 
 	for _, t := range cache.Tasks {
-		if err := client.Client.Task.Delete(&v1.DeleteTaskParams{
+		if err := client.Client.Task.Delete(&v2.DeleteTaskParams{
 			TaskID: t.ID,
 		}); err != nil {
 			panic(err)
@@ -67,7 +67,7 @@ func (b *Builder) RemoveStack() {
 	}
 
 	for _, w := range cache.Webhooks {
-		if err := client.Client.Webhook.Delete(&v1.DeleteWebhookParams{
+		if err := client.Client.Webhook.Delete(&v2.DeleteWebhookParams{
 			WebhookID: w.ID,
 		}); err != nil {
 			panic(err)
@@ -76,7 +76,7 @@ func (b *Builder) RemoveStack() {
 	}
 
 	for _, d := range cache.Domains {
-		if err := client.Client.Domain.Delete(&v1.DeleteDomainParams{
+		if err := client.Client.Domain.Delete(&v2.DeleteDomainParams{
 			DomainID: d.ID,
 		}); err != nil {
 			panic(err)
@@ -85,7 +85,7 @@ func (b *Builder) RemoveStack() {
 	}
 
 	for _, kv := range cache.KeyValues {
-		if err := client.Client.KeyValue.Delete(&v1.DeleteKeyValueParams{
+		if err := client.Client.KeyValue.Delete(&v2.DeleteKeyValueParams{
 			Namespace: kv.Namespace,
 			Key:       kv.Key,
 		}); err != nil {

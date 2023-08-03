@@ -13,8 +13,8 @@ import (
 	"github.com/heeser-io/universe-cli/builder"
 	"github.com/heeser-io/universe-cli/client"
 	"github.com/heeser-io/universe-cli/config"
-	v1 "github.com/heeser-io/universe/api/v1"
-	"github.com/heeser-io/universe/services/v1/websocket"
+	v2 "github.com/heeser-io/universe/api/v2"
+	"github.com/heeser-io/universe/services/v2/websocket"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/cobra"
 )
@@ -74,7 +74,7 @@ var (
 					} else if message.Action == "pong" {
 						// ignore
 					} else {
-						logObj := v1.Log{}
+						logObj := v2.Log{}
 						if err := mapstructure.Decode(message.Message, &logObj); err != nil {
 							log.Println(err)
 						} else {
@@ -107,7 +107,7 @@ var (
 					for _, resource := range *Resources {
 						channels = append(channels, fmt.Sprintf("log.%s", resource))
 					}
-					_, err := client.Client.Websocket.JoinChannels(&v1.JoinChannelsParams{
+					_, err := client.Client.Websocket.JoinChannels(&v2.JoinChannelsParams{
 						ConnectionID: connectionObj.ID,
 						Channels:     channels,
 					})

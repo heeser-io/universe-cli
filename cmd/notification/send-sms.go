@@ -3,7 +3,7 @@ package notification
 import (
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +16,7 @@ var (
 		Use:   "send-sms",
 		Short: "sends an sms with the given parameters",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := client.Client.SMS.SendSMS(&v1.SendSMSParams{
+			err := client.Client.SMS.SendSMS(&v2.SendSMSParams{
 				Phone:    Phone,
 				Message:  Message,
 				SenderID: SenderID,

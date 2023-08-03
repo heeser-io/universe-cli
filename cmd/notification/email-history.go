@@ -5,7 +5,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +22,7 @@ var (
 		Use:   "email-history",
 		Short: "list email history for the current authenticated user",
 		Run: func(cmd *cobra.Command, args []string) {
-			emailHistory, err := client.Client.Email.ListHistory(&v1.ListEmailHistoryParams{
+			emailHistory, err := client.Client.Email.ListHistory(&v2.ListEmailHistoryParams{
 				Filter:      Filter,
 				Limit:       Limit,
 				Sort:        Sort,
@@ -35,7 +35,7 @@ var (
 			if err != nil {
 				color.Red("err:%v\n", err)
 			}
-			fmt.Println(string(v1.StructToByte(emailHistory)))
+			fmt.Println(string(v2.StructToByte(emailHistory)))
 		},
 	}
 )

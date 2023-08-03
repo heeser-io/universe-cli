@@ -6,10 +6,10 @@ import (
 	"path"
 
 	"github.com/heeser-io/universe-cli/shell"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 )
 
-func MakeZip(lang Language, p string, function v1.Function) error {
+func MakeZip(lang Language, p string, function v2.Function) error {
 	currentPath, err := os.Getwd()
 	if err != nil {
 		return err

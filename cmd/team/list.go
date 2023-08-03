@@ -5,7 +5,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +22,7 @@ var (
 		Use:   "list",
 		Short: "list all teams for the current authenticated user (owned teams included)",
 		Run: func(cmd *cobra.Command, args []string) {
-			teams, err := client.Client.Team.List(&v1.ListTeamParams{
+			teams, err := client.Client.Team.List(&v2.ListTeamParams{
 				Filter:      Filter,
 				Limit:       Limit,
 				Sort:        Sort,
@@ -35,7 +35,7 @@ var (
 			if err != nil {
 				color.Red("err:%v\n", err)
 			}
-			fmt.Println(string(v1.StructToByte(teams)))
+			fmt.Println(string(v2.StructToByte(teams)))
 		},
 	}
 )

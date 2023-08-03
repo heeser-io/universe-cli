@@ -5,7 +5,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +17,7 @@ var (
 		Use:   "update",
 		Short: "update a root or sub account",
 		Run: func(cmd *cobra.Command, args []string) {
-			p, err := client.Client.Profile.Update(&v1.UpdateProfileParams{
+			p, err := client.Client.Profile.Update(&v2.UpdateProfileParams{
 				AccountID: AccountID,
 				ClientID:  ClientID,
 				Avatar:    Avatar,
@@ -26,7 +26,7 @@ var (
 			if err != nil {
 				color.Red(err.Error())
 			}
-			fmt.Println(string(v1.StructToByte(p)))
+			fmt.Println(string(v2.StructToByte(p)))
 		},
 	}
 )

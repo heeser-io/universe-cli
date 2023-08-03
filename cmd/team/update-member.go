@@ -3,7 +3,7 @@ package team
 import (
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +14,7 @@ var (
 		Use:   "update-member",
 		Short: "updates a team member with the given params",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := client.Client.Team.UpdateMember(&v1.UpdateMemberParams{
+			err := client.Client.Team.UpdateMember(&v2.UpdateMemberParams{
 				TeamID: TeamID,
 				Email:  UpdateMemberEmail,
 				Access: UpdateMemberAccess,

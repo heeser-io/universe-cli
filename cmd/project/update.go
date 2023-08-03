@@ -5,7 +5,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +14,7 @@ var (
 		Use:   "update",
 		Short: "updates a project with the given params",
 		Run: func(cmd *cobra.Command, args []string) {
-			projectObj, err := client.Client.Project.Update(&v1.UpdateProjectParams{
+			projectObj, err := client.Client.Project.Update(&v2.UpdateProjectParams{
 				ProjectID: ProjectID,
 				Name:      Name,
 				Tags:      *Tags,
@@ -22,7 +22,7 @@ var (
 			if err != nil {
 				color.Red("err:%v\n", err)
 			}
-			fmt.Println(string(v1.StructToByte(projectObj)))
+			fmt.Println(string(v2.StructToByte(projectObj)))
 		},
 	}
 )

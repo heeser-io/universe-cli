@@ -3,7 +3,7 @@ package team
 import (
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -12,7 +12,7 @@ var (
 		Use:   "confirm-invite",
 		Short: "confirms an team invitation for the current authenticated user",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := client.Client.Team.ConfirmInvite(&v1.ConfirmInviteParams{
+			err := client.Client.Team.ConfirmInvite(&v2.ConfirmInviteParams{
 				TeamID: TeamID,
 			})
 			if err != nil {

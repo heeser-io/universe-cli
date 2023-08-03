@@ -6,7 +6,7 @@ import (
 	"path"
 
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 )
 
 type UpdateAndUploadFunction struct {
@@ -19,7 +19,7 @@ type UpdateAndUploadFunction struct {
 }
 
 func ReleaseFunction(functionID string) error {
-	releaseParams := v1.ReleaseFunctionParams{
+	releaseParams := v2.ReleaseFunctionParams{
 		FunctionID: functionID,
 	}
 
@@ -30,8 +30,8 @@ func ReleaseFunction(functionID string) error {
 	return nil
 }
 
-func UpdateFunction(params *v1.UpdateFunctionParams) (*v1.Function, error) {
-	fileParams := v1.CreateFileParams{
+func UpdateFunction(params *v2.UpdateFunctionParams) (*v2.Function, error) {
+	fileParams := v2.CreateFileParams{
 		Filename:       path.Base(params.Path),
 		Name:           fmt.Sprintf("function %s", params.FunctionID),
 		Tags:           []string{"functions"},
@@ -57,8 +57,8 @@ func UpdateFunction(params *v1.UpdateFunctionParams) (*v1.Function, error) {
 
 	return functionObj, nil
 }
-func CreateFunction(params *v1.Function) (*v1.Function, error) {
-	fileParams := v1.CreateFileParams{
+func CreateFunction(params *v2.Function) (*v2.Function, error) {
+	fileParams := v2.CreateFileParams{
 		Filename:       path.Base(params.Path),
 		Name:           fmt.Sprintf("function %s", params.Name),
 		ProjectID:      params.ProjectID,
@@ -77,7 +77,7 @@ func CreateFunction(params *v1.Function) (*v1.Function, error) {
 	}
 	fileObj.SignedUploadUrl = ""
 
-	createFunctionParams := v1.CreateFunctionParams{
+	createFunctionParams := v2.CreateFunctionParams{
 		Name:        params.Name,
 		ProjectID:   params.ProjectID,
 		Checksum:    params.Checksum,

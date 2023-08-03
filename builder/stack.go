@@ -6,7 +6,7 @@ import (
 	"path"
 
 	"github.com/heeser-io/universe-cli/config"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/thoas/go-funk"
 	"gopkg.in/yaml.v2"
 )
@@ -14,18 +14,18 @@ import (
 type Stack struct {
 	BasePath      string                `yaml:"basePath"`
 	Stacks        []ServiceStack        `yaml:"stacks"`
-	Project       v1.Project            `yaml:"project"`
-	OAuth         v1.OAuth              `yaml:"oauth"`
-	Functions     []v1.Function         `yaml:"functions"`
-	Gateways      []v1.Gateway          `yaml:"gateways"`
-	Secrets       []v1.Secret           `yaml:"secrets"`
+	Project       v2.Project            `yaml:"project"`
+	OAuth         v2.OAuth              `yaml:"oauth"`
+	Functions     []v2.Function         `yaml:"functions"`
+	Gateways      []v2.Gateway          `yaml:"gateways"`
+	Secrets       []v2.Secret           `yaml:"secrets"`
 	Filemapping   []Filemapping         `yaml:"filemapping"`
-	Tasks         []v1.CreateTaskParams `yaml:"tasks"`
-	Subscriptions []v1.Subscription     `yaml:"subscriptions"`
-	Templates     []v1.Template         `yaml:"templates"`
-	Webhooks      []v1.Webhook          `yaml:"webhooks"`
-	Domains       []v1.Domain           `yaml:"domains"`
-	KeyValues     []v1.KeyValue         `yaml:"keyvalues"`
+	Tasks         []v2.CreateTaskParams `yaml:"tasks"`
+	Subscriptions []v2.Subscription     `yaml:"subscriptions"`
+	Templates     []v2.Template         `yaml:"templates"`
+	Webhooks      []v2.Webhook          `yaml:"webhooks"`
+	Domains       []v2.Domain           `yaml:"domains"`
+	KeyValues     []v2.KeyValue         `yaml:"keyvalues"`
 }
 
 type ServiceStack struct {

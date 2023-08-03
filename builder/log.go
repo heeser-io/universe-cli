@@ -38,14 +38,14 @@ func (b *Builder) Logs() {
 	go func() {
 		// receive messages
 		// for {
-		// 	msg := v1.IncomingMessage{}
+		// 	msg := v2.IncomingMessage{}
 		// 	if err := c.ReadJSON(&msg); err != nil {
 		// 		log.Println("read: ", err)
 		// 		os.Exit(1)
 		// 		return
 		// 	}
 
-		// 	log := v1.Log{}
+		// 	log := v2.Log{}
 
 		// 	if err := json.Unmarshal([]byte(msg.Message), &log); err != nil {
 		// 		fmt.Printf("err: %v\n", err)

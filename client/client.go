@@ -2,11 +2,11 @@ package client
 
 import (
 	"github.com/heeser-io/universe-cli/config"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 )
 
 var (
-	Client *v1.Client
+	Client *v2.Client
 	ApiKey string
 )
 
@@ -16,8 +16,8 @@ func Init() {
 	token := config.Main.GetString("token")
 
 	if token != "" {
-		Client = v1.WithToken(token)
+		Client = v2.WithToken(token)
 	} else {
-		Client = v1.WithAPIKey(ApiKey)
+		Client = v2.WithAPIKey(ApiKey)
 	}
 }

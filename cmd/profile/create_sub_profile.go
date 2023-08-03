@@ -5,7 +5,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +16,7 @@ var (
 		Use:   "create-subprofile",
 		Short: "create a sub profile with the given params",
 		Run: func(cmd *cobra.Command, args []string) {
-			p, err := client.Client.Profile.CreateSubprofile(&v1.CreateSubprofileParams{
+			p, err := client.Client.Profile.CreateSubprofile(&v2.CreateSubprofileParams{
 				AccountID: AccountID,
 				ClientID:  ClientID,
 				Email:     Email,
@@ -26,7 +26,7 @@ var (
 			if err != nil {
 				color.Red(err.Error())
 			}
-			fmt.Println(string(v1.StructToByte(p)))
+			fmt.Println(string(v2.StructToByte(p)))
 		},
 	}
 )

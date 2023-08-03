@@ -13,8 +13,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/heeser-io/universe-cli/helper"
-	v1 "github.com/heeser-io/universe/api/v1"
-	"github.com/heeser-io/universe/services/v1/gateway"
+	v2 "github.com/heeser-io/universe/api/v2"
+	"github.com/heeser-io/universe/services/v2/gateway"
 	"github.com/olekukonko/tablewriter"
 )
 
@@ -24,7 +24,7 @@ var (
 
 type ProxyPath struct {
 	p       *httputil.ReverseProxy
-	gateway *v1.Gateway
+	gateway *v2.Gateway
 	route   gateway.Route
 }
 type Proxy struct {
@@ -77,7 +77,7 @@ func (proxy *Proxy) AddFunction(fName, host, port string) error {
 	return nil
 }
 
-func (proxy *Proxy) Add(gateway *v1.Gateway, route gateway.Route, host string) error {
+func (proxy *Proxy) Add(gateway *v2.Gateway, route gateway.Route, host string) error {
 	u, err := url.Parse(fmt.Sprintf("http://%v/", host))
 	if err != nil {
 		log.Printf("Error parsing URL")

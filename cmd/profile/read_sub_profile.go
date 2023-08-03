@@ -5,7 +5,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/heeser-io/universe-cli/client"
-	v1 "github.com/heeser-io/universe/api/v1"
+	v2 "github.com/heeser-io/universe/api/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -16,14 +16,14 @@ var (
 		Use:   "read-subprofile",
 		Short: "reads a subprofile",
 		Run: func(cmd *cobra.Command, args []string) {
-			p, err := client.Client.Profile.ReadSubprofile(&v1.ReadSubprofileParams{
+			p, err := client.Client.Profile.ReadSubprofile(&v2.ReadSubprofileParams{
 				AccountID: AccountID,
 				ClientID:  ClientID,
 			})
 			if err != nil {
 				color.Red(err.Error())
 			}
-			fmt.Println(string(v1.StructToByte(p)))
+			fmt.Println(string(v2.StructToByte(p)))
 		},
 	}
 )
