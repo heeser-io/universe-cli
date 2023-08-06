@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/heeser-io/universe-cli/helper"
 	v1 "github.com/heeser-io/universe/api/v1"
-	"github.com/heeser-io/universe/services/v1/gateway"
+	"github.com/heeser-io/universe/services/gateway"
 	"github.com/olekukonko/tablewriter"
 )
 

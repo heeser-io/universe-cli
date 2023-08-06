@@ -14,7 +14,7 @@ import (
 	"github.com/heeser-io/universe-cli/client"
 	"github.com/heeser-io/universe-cli/config"
 	v1 "github.com/heeser-io/universe/api/v1"
-	"github.com/heeser-io/universe/services/v1/websocket"
+	"github.com/heeser-io/universe/services/websocket"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/cobra"
 )
