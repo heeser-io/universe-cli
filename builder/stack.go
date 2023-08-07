@@ -15,6 +15,7 @@ type Stack struct {
 	BasePath      string                `yaml:"basePath"`
 	Stacks        []ServiceStack        `yaml:"stacks"`
 	Project       v1.Project            `yaml:"project"`
+	AuthProvider  string                `yaml:"authProvider"`
 	OAuth         v1.OAuth              `yaml:"oauth"`
 	Functions     []v1.Function         `yaml:"functions"`
 	Gateways      []v1.Gateway          `yaml:"gateways"`

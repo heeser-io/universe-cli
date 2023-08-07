@@ -920,6 +920,7 @@ func (b *Builder) buildOAuth() error {
 			color.Yellow("oauth %s exists", co.ID)
 			updateOAuthParams := v1.UpdateOAuthParams{
 				OAuthID:      co.ID,
+				Name:         stack.OAuth.App.ClientName,
 				RedirectUrls: stack.OAuth.App.RedirectUrls,
 				LogoutUrls:   stack.OAuth.App.LogoutUrls,
 			}
@@ -938,6 +939,7 @@ func (b *Builder) buildOAuth() error {
 				LogoutUrls:   stack.OAuth.App.LogoutUrls,
 				AppName:      stack.OAuth.App.ClientName,
 				Tags:         stack.OAuth.Tags,
+				Provider:     &stack.AuthProvider,
 			}
 
 			oauthObj, err := client.Client.OAuth.Create(&createOAuthParams)
