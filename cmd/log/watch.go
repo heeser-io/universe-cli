@@ -74,7 +74,11 @@ var (
 					} else if message.Action == "pong" {
 						// ignore
 					} else {
-						logObj := v1.Log{}
+						logObj := struct {
+							CreatedAt string
+							Resource  string
+							Value     string
+						}{}
 						if err := mapstructure.Decode(message.Message, &logObj); err != nil {
 							log.Println(err)
 						} else {
