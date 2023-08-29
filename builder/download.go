@@ -33,6 +33,7 @@ func (b *Builder) Download(project *v1.Project) error {
 		Domains:       map[string]*v1.Domain{},
 		Filemappings:  map[string][]*v1.File{},
 		Webhooks:      map[string]*v1.Webhook{},
+		KeyValues:     map[string]*v1.KeyValue{},
 	}
 
 	functions, err := client.Client.Function.List(&v1.ListFunctionParams{
