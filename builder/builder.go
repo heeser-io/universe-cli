@@ -55,14 +55,18 @@ func New(path string, download bool) (*Builder, error) {
 
 	cache := LoadOrCreate(path)
 
-	if stack.Project.Branch != "" {
-		client.Client.SetBranch(stack.Project.Branch)
+	projectChanged := false
+	stackProject := stack.Project
+	cacheProject := cache.Project
+
+	if stackProject.Branch != "" {
+		client.Client.SetBranch(stackProject.Branch)
 	}
 
-	if cache.Project == nil && !download {
+	if cacheProject == nil && !download {
 		projectObj, err := client.Client.Project.Create(&v1.CreateProjectParams{
-			Name: stack.Project.Name,
-			Tags: stack.Project.Tags,
+			Name: stackProject.Name,
+			Tags: stackProject.Tags,
 		})
 		if err != nil {
 			panic(err)
@@ -70,21 +74,35 @@ func New(path string, download bool) (*Builder, error) {
 		cache.Project = projectObj
 		color.Green("successfully created project %s", projectObj.ID)
 	} else if !download {
-		params := &v1.UpdateProjectParams{
-			ProjectID: cache.Project.ID,
-			Name:      stack.Project.Name,
-			Tags:      stack.Project.Tags,
-		}
-		if stack.Project.Settings != nil {
-			params.Settings = *stack.Project.Settings
+		// only update if cache project differs stack project
+
+		if stackProject.Name != cacheProject.Name {
+			projectChanged = true
 		}
 
-		projectObj, err := client.Client.Project.Update(params)
-		if err != nil {
-			panic(err)
+		if !funk.Equal(stackProject.Tags, cacheProject.Tags) && stackProject.Tags != nil && cacheProject.Tags != nil {
+			projectChanged = true
 		}
-		cache.Project = projectObj
-		color.Green("successfully updated project %s", projectObj.ID)
+
+		if projectChanged {
+			params := &v1.UpdateProjectParams{
+				ProjectID: cacheProject.ID,
+				Name:      stackProject.Name,
+				Tags:      stackProject.Tags,
+			}
+			if stackProject.Settings != nil {
+				params.Settings = *stackProject.Settings
+			}
+
+			projectObj, err := client.Client.Project.Update(params)
+			if err != nil {
+				panic(err)
+			}
+			cache.Project = projectObj
+			color.Green("successfully updated project %s", projectObj.ID)
+		} else {
+			color.Green("project %s not changed", cacheProject.ID)
+		}
 	}
 
 	if cache.Functions == nil {
@@ -331,6 +349,7 @@ func (b *Builder) buildKeyValues() error {
 				Key:       kv.Key,
 				Namespace: kv.Namespace,
 				Value:     kv.Value,
+				NumValue:  kv.NumValue,
 			}
 
 			keyvalueObj, err := client.Client.KeyValue.Update(&updateKeyvalueParams)
@@ -346,6 +365,7 @@ func (b *Builder) buildKeyValues() error {
 				Namespace: kv.Namespace,
 				Key:       kv.Key,
 				Value:     kv.Value,
+				NumValue:  kv.NumValue,
 				Tags:      kv.Tags,
 			}
 
